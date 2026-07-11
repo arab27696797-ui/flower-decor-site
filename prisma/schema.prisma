@@ -1,0 +1,76 @@
+// This is your Prisma schema file
+// Learn more about it here: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Lead {
+  id            String    @id @default(uuid())
+  name          String
+  phone         String
+  eventType     String
+  desiredDate   DateTime
+  comment       String?
+  cartItems     Json
+
+  utmSource     String?
+  utmMedium     String?
+  utmCampaign   String?
+  utmTerm       String?
+  utmContent    String?
+  referrerPage  String?
+  deviceType    String
+
+  status        String    @default("new")
+  paymentStatus String    @default("unpaid")
+  paidAmount    Int?
+
+  createdAt     DateTime  @default(now())
+}
+
+model PricingRule {
+  id             String    @id @default(uuid())
+  calcType       String
+  category       String
+  label          String
+  marketLo       Int
+  marketHi       Int
+  markupPercent  Float     @default(30)
+  artificialCoef Float     @default(0.6)
+  isActive       Boolean   @default(true)
+  updatedAt      DateTime  @updatedAt
+  updatedBy      String?
+}
+
+model SubscriptionTier {
+  id              String   @id @default(uuid())
+  tierId          String
+  visitsPerMonth  Int      @default(4)
+  costPerVisit    Int
+  markupPercent   Float    @default(30)
+  zoneDescription String
+  isActive        Boolean  @default(true)
+}
+
+model PricingHistory {
+  id        String    @id @default(uuid())
+  ruleId    String
+  oldValue  Json
+  newValue  Json
+  changedBy String?
+  changedAt DateTime  @default(now())
+}
+
+model PortfolioImage {
+  id        String   @id @default(uuid())
+  url       String
+  eventType String
+  sortOrder Int
+  isActive  Boolean  @default(true)
+}
