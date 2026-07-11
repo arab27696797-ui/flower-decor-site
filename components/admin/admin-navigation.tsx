@@ -15,13 +15,16 @@ type AdminNavigationProps = {
 
 export function AdminNavigation({ items }: AdminNavigationProps) {
   return (
-    <nav aria-label="Навигация по админке" className="flex flex-col gap-2">
+    <nav
+      aria-label="Навигация по админке"
+      className="flex gap-2 overflow-x-auto pb-1 md:flex-col md:overflow-visible md:pb-0"
+    >
       {items.map((item) => (
         <Link
           key={item.href}
           href={item.href}
           className={cn(
-            'group rounded-card border px-4 py-3 transition-colors duration-200',
+            'group min-w-[220px] rounded-card border px-4 py-3 transition-colors duration-200 md:min-w-0',
             'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-gold/70 focus-visible:ring-offset-2 focus-visible:ring-offset-brand-cream',
             item.isActive
               ? 'border-brand-forest/20 bg-brand-forest text-white shadow-card'
