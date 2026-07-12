@@ -4,8 +4,9 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 
 export type AdminNavigationItem = {
-  label: string;
   href: string;
+  label: string;
+  description?: string;
 };
 
 type AdminNavigationProps = {
@@ -13,9 +14,6 @@ type AdminNavigationProps = {
 };
 
 function isActiveRoute(pathname: string, href: string): boolean {
-  if (href === "/admin") {
-    return pathname === "/admin";
-  }
   return pathname === href || pathname.startsWith(`${href}/`);
 }
 
@@ -34,7 +32,7 @@ export function AdminNavigation({ items }: AdminNavigationProps) {
 
   return (
     <nav
-      className="flex flex-col gap-1 md:flex-1"
+      className="flex flex-col gap-1 md:mt-2"
       aria-label="Admin navigation"
     >
       <div className="flex gap-1 overflow-x-auto md:flex-col md:overflow-visible">
@@ -45,13 +43,24 @@ export function AdminNavigation({ items }: AdminNavigationProps) {
               key={item.href}
               href={item.href}
               aria-current={active ? "page" : undefined}
-              className={`whitespace-nowrap rounded-md px-3 py-2 text-sm font-medium transition-colors md:whitespace-normal ${
+              className={`rounded-md px-3 py-2 text-sm font-medium transition-colors md:block ${
                 active
                   ? "bg-brand-forest text-white"
                   : "text-brand-ink hover:bg-brand-cream"
               }`}
             >
-              {item.label}
+              <span className="whitespace-nowrap md:whitespace-normal">
+                {item.label}
+              </span>
+              {item.description ? (
+                <span
+                  className={`mt-0.5 hidden text-xs md:block ${
+                    active ? "text-white/80" : "text-brand-ink/60"
+                  }`}
+                >
+                  {item.description}
+                </span>
+              ) : null}
             </Link>
           );
         })}
