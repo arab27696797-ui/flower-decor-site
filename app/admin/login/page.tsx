@@ -62,7 +62,7 @@ export default function AdminLoginPage() {
         success: 'Вход выполнен. Перенаправляем в панель управления.',
       })
 
-      router.push('/admin')
+      router.replace('/admin')
       router.refresh()
     } catch {
       setState({
