@@ -3,19 +3,14 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 
-interface AdminNavItem {
+export type AdminNavigationItem = {
   label: string;
   href: string;
-}
+};
 
-const NAV_ITEMS: AdminNavItem[] = [
-  { label: "Dashboard", href: "/admin" },
-  { label: "Leads", href: "/admin/leads" },
-  { label: "Pricing", href: "/admin/pricing" },
-  { label: "Pricing History", href: "/admin/pricing/history" },
-  { label: "Subscriptions", href: "/admin/subscriptions" },
-  { label: "Portfolio", href: "/admin/portfolio" },
-];
+type AdminNavigationProps = {
+  items: AdminNavigationItem[];
+};
 
 function isActiveRoute(pathname: string, href: string): boolean {
   if (href === "/admin") {
@@ -24,7 +19,7 @@ function isActiveRoute(pathname: string, href: string): boolean {
   return pathname === href || pathname.startsWith(`${href}/`);
 }
 
-export function AdminNavigation() {
+export function AdminNavigation({ items }: AdminNavigationProps) {
   const pathname = usePathname();
   const router = useRouter();
 
@@ -38,37 +33,37 @@ export function AdminNavigation() {
   }
 
   return (
-    <div className="flex w-full items-center justify-between gap-2">
-      <nav
-        className="flex gap-1 overflow-x-auto"
-        aria-label="Admin navigation"
-      >
-        {NAV_ITEMS.map((item) => {
+    <nav
+      className="flex flex-col gap-1 md:flex-1"
+      aria-label="Admin navigation"
+    >
+      <div className="flex gap-1 overflow-x-auto md:flex-col md:overflow-visible">
+        {items.map((item) => {
           const active = isActiveRoute(pathname, item.href);
           return (
             <Link
               key={item.href}
               href={item.href}
               aria-current={active ? "page" : undefined}
-              className={`whitespace-nowrap rounded-md px-3 py-2 text-sm font-medium transition-colors ${
+              className={`whitespace-nowrap rounded-md px-3 py-2 text-sm font-medium transition-colors md:whitespace-normal ${
                 active
-                  ? "bg-[#2D5016] text-white"
-                  : "text-[#1A1A1A] hover:bg-[#FAF8F5]"
+                  ? "bg-brand-forest text-white"
+                  : "text-brand-ink hover:bg-brand-cream"
               }`}
             >
               {item.label}
             </Link>
           );
         })}
-      </nav>
+      </div>
 
       <button
         type="button"
         onClick={handleLogout}
-        className="shrink-0 rounded-md border border-[#C8A96E] px-3 py-2 text-sm font-medium text-[#1A1A1A] transition-colors hover:bg-[#E8C5C5]"
+        className="mt-3 rounded-md border border-brand-gold/40 px-3 py-2 text-left text-sm font-medium text-brand-ink transition-colors hover:bg-brand-gold/10 md:mt-4"
       >
         Logout
       </button>
-    </div>
+    </nav>
   );
 }
