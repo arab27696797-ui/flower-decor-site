@@ -35,5 +35,14 @@ export const createPortfolioImageSchema = z.object({
   isActive: z.boolean().default(true),
 })
 
+export const updatePortfolioImageSchema = z.object({
+  id: z.string().min(1),
+  url: z.string().url().max(2048),
+  eventType: z.string().min(2).max(100),
+  sortOrder: z.number().int().min(0),
+  isActive: z.boolean(),
+})
+
 export type CreateLeadInput = z.infer<typeof createLeadSchema>
 export type CreatePortfolioImageInput = z.infer<typeof createPortfolioImageSchema>
+export type UpdatePortfolioImageInput = z.infer<typeof updatePortfolioImageSchema>
