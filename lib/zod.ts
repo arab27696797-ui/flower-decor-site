@@ -28,4 +28,12 @@ export const createLeadSchema = z.object({
   deviceType: z.string().min(2).max(50),
 })
 
+export const createPortfolioImageSchema = z.object({
+  url: z.string().url().max(2048),
+  eventType: z.string().min(2).max(100),
+  sortOrder: z.number().int().min(0),
+  isActive: z.boolean().default(true),
+})
+
 export type CreateLeadInput = z.infer<typeof createLeadSchema>
+export type CreatePortfolioImageInput = z.infer<typeof createPortfolioImageSchema>
