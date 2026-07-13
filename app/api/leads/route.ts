@@ -1,70 +1,21 @@
 // app/api/leads/route.ts
-// Next.js App Router POST route — lead capture endpoint.
-// Accepts the new EstimateCart payload shape from components/site/lead-form.tsx.
-// Validates with an inline zod schema (compatible with the new payload).
-// Writes to DB via prisma using the established repository pattern from lib/prisma.
-// Sends to Telegram via lib/telegram.ts sendLeadToTelegram after a successful DB write.
-// If the DB write fails, Telegram is NOT called — preserves data integrity order.
-// If Telegram fails, we still return ok:true — the lead is already persisted.
+// Next.js App Router POST handler — lead capture endpoint (v2, cleaned up).
+// Uses shared createLeadV2Schema from lib/zod.ts — no inline schemas.
+// Flow: parse → validate → DB write (Prisma) → Telegram notification → respond.
+// Telegram failure is non-fatal: lead is already persisted, ok:true is still returned.
 
 import { NextResponse } from 'next/server'
-import { z }            from 'zod'
 
-import { prisma }               from '@/lib/prisma'
-import { sendLeadToTelegram }   from '@/lib/telegram'
-
-// ---------------------------------------------------------------------------
-// Inline schema for the new EstimateCart-based payload
-// Replaces the old createLeadSchema for this route only.
-// lib/zod.ts will be updated separately to keep it aligned.
-// ---------------------------------------------------------------------------
-
-// Mirrors CategorySelection from lib/calculator-config.ts — validated loosely
-// so the route is resilient to future config changes.
-const selectionSchema = z.object({
-  fieldId:         z.string(),
-  labelRu:         z.string(),
-  labelEn:         z.string(),
-  selectedValue:   z.union([z.string(), z.boolean(), z.number()]),
-  selectedLabelRu: z.string(),
-  selectedLabelEn: z.string(),
-})
-
-// Mirrors CartItem from lib/calculator-config.ts
-const cartItemSchema = z.object({
-  id:                   z.string().min(1),
-  categoryId:           z.string().min(1),
-  categoryLabelRu:      z.string(),
-  categoryLabelEn:      z.string(),
-  selections:           z.array(selectionSchema),
-  basePrice:            z.number().nonnegative(),
-  subtotalWithMarkup:   z.number().nonnegative(),
-})
-
-// Mirrors EstimateCart from lib/calculator-config.ts
-const estimateCartSchema = z.object({
-  items:              z.array(cartItemSchema),
-  totalBeforeMarkup:  z.number().nonnegative(),
-  totalWithMarkup:    z.number().nonnegative(),
-})
-
-// Full lead request schema — matches LeadRequestPayload in components/site/lead-form.tsx
-const leadRequestSchema = z.object({
-  name:         z.string().min(2).max(100),
-  phone:        z.string().min(5).max(30),
-  location:     z.string().min(3).max(300),
-  comment:      z.string().max(2000).optional().nullable(),
-  estimateCart: estimateCartSchema.nullable(),
-  deviceType:   z.string().min(2).max(50).optional().default('unknown'),
-})
-
-type LeadRequest = z.infer<typeof leadRequestSchema>
+import { prisma }                          from '@/lib/prisma'
+import { sendLeadToTelegram }              from '@/lib/telegram'
+import { createLeadV2Schema, type CreateLeadV2Input } from '@/lib/zod'
 
 // ---------------------------------------------------------------------------
-// POST handler
+// POST /api/leads
 // ---------------------------------------------------------------------------
 
 export async function POST(request: Request): Promise<NextResponse> {
+
   // ---- 1. Parse body -------------------------------------------------------
   let rawBody: unknown
   try {
@@ -76,8 +27,9 @@ export async function POST(request: Request): Promise<NextResponse> {
     )
   }
 
-  // ---- 2. Validate ---------------------------------------------------------
-  const parsed = leadRequestSchema.safeParse(rawBody)
+  // ---- 2. Validate with shared schema -------------------------------------
+  const parsed = createLeadV2Schema.safeParse(rawBody)
+
   if (!parsed.success) {
     return NextResponse.json(
       {
@@ -89,34 +41,36 @@ export async function POST(request: Request): Promise<NextResponse> {
     )
   }
 
-  const data: LeadRequest = parsed.data
+  const data: CreateLeadV2Input = parsed.data
 
   // ---- 3. Persist to DB (Prisma) -------------------------------------------
-  // cartItems is stored as JSON (Prisma Json field) — same pattern as original route.
-  // estimateCart replaces the old cartItems array.
+  // Compatibility mapping note:
+  // The current Prisma Lead model does not yet have a dedicated `location` field.
+  // Until the schema migration is run, `location` is stored in `eventType`
+  // (the nearest semantically acceptable existing field).
+  // `desiredDate` is set to null — removed from v2 flow.
+  // `cartItems` is a Prisma Json column — stores the full EstimateCart or [].
   let leadId: string
+
   try {
     const lead = await prisma.lead.create({
       data: {
-        name:         data.name,
-        phone:        data.phone,
-        // location maps to the nearest existing Prisma field.
-        // If the Prisma schema has no `location` field yet, it falls back
-        // to eventType which already exists — the schema migration is tracked
-        // separately as the next step.
-        eventType:    data.location,
-        desiredDate:  null,
-        comment:      data.comment ?? null,
-        // Store the full cart as JSON — existing cartItems field is a Json column.
-        cartItems:    data.estimateCart
-                        ? (data.estimateCart as unknown as Parameters<typeof prisma.lead.create>[0]['data']['cartItems'])
-                        : [],
-        deviceType:   data.deviceType,
+        name:        data.name,
+        phone:       data.phone,
+        eventType:   data.location,           // compatibility: location → eventType
+        desiredDate: null,                    // not collected in v2 flow
+        comment:     data.comment ?? null,
+        cartItems:   data.estimateCart
+                       ? (data.estimateCart as unknown as Parameters<
+                           typeof prisma.lead.create
+                         >[0]['data']['cartItems'])
+                       : [],
+        deviceType:  data.deviceType,
       },
     })
+
     leadId = lead.id
   } catch (dbError) {
-    // Log for server-side observability; do not expose internals to client.
     console.error('[leads/route] DB write failed:', dbError)
     return NextResponse.json(
       { ok: false, error: 'INTERNAL_SERVER_ERROR' },
@@ -124,7 +78,7 @@ export async function POST(request: Request): Promise<NextResponse> {
     )
   }
 
-  // ---- 4. Send to Telegram (non-blocking failure) --------------------------
+  // ---- 4. Telegram notification (non-fatal) --------------------------------
   try {
     await sendLeadToTelegram({
       leadId,
@@ -135,8 +89,7 @@ export async function POST(request: Request): Promise<NextResponse> {
       estimateCart: data.estimateCart,
     })
   } catch (tgError) {
-    // Telegram failure must not break the lead capture —
-    // lead is already persisted. Log and continue.
+    // Lead is already persisted — Telegram failure must not break the response.
     console.error('[leads/route] Telegram notification failed:', tgError)
   }
 
@@ -146,5 +99,8 @@ export async function POST(request: Request): Promise<NextResponse> {
 
 // Reject all other HTTP methods explicitly
 export async function GET(): Promise<NextResponse> {
-  return NextResponse.json({ ok: false, error: 'METHOD_NOT_ALLOWED' }, { status: 405 })
+  return NextResponse.json(
+    { ok: false, error: 'METHOD_NOT_ALLOWED' },
+    { status: 405 },
+  )
 }
