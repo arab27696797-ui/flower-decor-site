@@ -1,0 +1,72 @@
+# railway.toml
+# PRIMA Decor — Railway deployment configuration.
+#
+# Documentation: https://docs.railway.com/reference/config-as-code
+#
+# WHAT THIS FILE DOES:
+#   Railway reads this file from the repository root to understand
+#   how to build and run the application, overriding any auto-detected defaults.
+#
+# BUILD COMMAND:
+#   1. `prisma generate`  — generates the Prisma Client from prisma/schema.prisma.
+#                           Must run before `next build` because the app imports
+#                           @prisma/client at compile time.
+#   2. `next build`       — compiles the Next.js App Router project.
+#                           Produces the .next/standalone output defined in
+#                           next.config.ts (output: 'standalone').
+#
+# START COMMAND:
+#   `node .next/standalone/server.js` — runs the standalone Next.js server.
+#   This is the correct start command when output: 'standalone' is set in
+#   next.config.ts. It does NOT use `next start`, which requires the full
+#   node_modules tree and is not suitable for standalone output.
+#
+# PRISMA MIGRATIONS:
+#   `prisma migrate deploy` is NOT included in the build command here.
+#   Railway recommends running migrations as a separate one-off job or
+#   by adding it to a deploy hook, not as part of the build phase.
+#   For the first deploy, run manually from Railway CLI or dashboard:
+#     railway run npx prisma migrate deploy
+#   After that, add it to a Railway cron or pre-deploy command as needed.
+#
+# HEALTH CHECK:
+#   Railway will probe GET / on the public domain.
+#   The Next.js root page (app/page.tsx) returns HTTP 200 and is a correct
+#   healthcheck target. No custom /api/health endpoint is needed for first deploy.
+#
+# ENVIRONMENT VARIABLES (must be set in Railway dashboard):
+#   DATABASE_URL         — PostgreSQL connection string (auto-set if you attach
+#                          a Railway PostgreSQL service to this project).
+#   NEXT_PUBLIC_SITE_URL — canonical public URL, e.g. https://prima-decor.up.railway.app
+#   ADMIN_SECRET_KEY     — secret used for admin JWT signing (min 32 chars)
+#   TELEGRAM_BOT_TOKEN   — Telegram Bot API token for lead notifications
+#   TELEGRAM_CHAT_ID     — Telegram chat/group ID to receive lead messages
+#   NODE_ENV             — Railway sets this to "production" automatically.
+#                          Do NOT set it manually.
+
+[build]
+  # Run Prisma client generation before the Next.js compiler starts.
+  # `npx` is used so the exact version from package.json is always used,
+  # regardless of any globally installed Prisma CLI on the build runner.
+  builder     = "NIXPACKS"
+  buildCommand = "npx prisma generate && npx next build"
+
+[deploy]
+  # Start the standalone Next.js server produced by `output: 'standalone'`
+  # in next.config.ts. Railway automatically sets PORT and HOSTNAME env vars;
+  # the standalone server reads them correctly.
+  startCommand  = "node .next/standalone/server.js"
+
+  # Number of instances. Keep at 1 for first deploy to avoid shared in-memory
+  # state issues (admin contact/pricing stores are still in-memory until the
+  # Prisma route refactor is done).
+  numReplicas   = 1
+
+  # Health check — Railway pings this path to confirm the deploy succeeded.
+  # Next.js root page returns 200 OK, which is sufficient.
+  healthcheckPath    = "/"
+  healthcheckTimeout = 30   # seconds to wait for 200 before marking deploy failed
+
+  # How long Railway gives the running process to gracefully shut down
+  # before sending SIGKILL on redeploy.
+  drainTimeout = 10
