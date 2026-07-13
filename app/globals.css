@@ -1,35 +1,534 @@
+/* app/globals.css
+ * PRIMA Decor — Global CSS foundation.
+ * Layer order: Tailwind base → Tailwind components → Tailwind utilities → custom layers.
+ * Brand tokens, typography defaults, motion utilities, and focus/selection styles.
+ * Designed to complement tailwind.config.ts (brand-* colors, font-display/sans,
+ * display-xl/lg/md sizes) — never duplicates or overrides Tailwind config values.
+ */
+
+/* --------------------------------------------------------------------------
+ * Tailwind directive layers
+ * ----------------------------------------------------------------------- */
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/* --------------------------------------------------------------------------
+ * CSS custom properties — brand palette + supporting shades
+ * Tailwind reads these via var(--font-cormorant) / var(--font-inter) injected
+ * by next/font in app/layout.tsx. Color tokens mirror tailwind.config.ts so
+ * they are also available in plain CSS (e.g. for pseudo-elements, SVG fill).
+ * ----------------------------------------------------------------------- */
+
 :root {
   color-scheme: light;
+
+  /* Brand palette — keep in sync with tailwind.config.ts */
+  --color-cream:        #FAF8F5;
+  --color-forest:       #2D5016;
+  --color-forest-dark:  #1E3610;   /* deeper hover/active variant */
+  --color-forest-light: #3D6B20;   /* lighter hover variant */
+  --color-gold:         #C8A96E;
+  --color-gold-light:   #D9BF92;   /* tinted glow, hover states */
+  --color-gold-dark:    #A8863E;   /* active states */
+  --color-blush:        #E8C5C5;
+  --color-blush-light:  #F2DADA;
+  --color-ink:          #1A1A1A;
+  --color-ink-muted:    rgba(26, 26, 26, 0.65);
+  --color-ink-faint:    rgba(26, 26, 26, 0.35);
+  --color-ink-hairline: rgba(26, 26, 26, 0.10);
+  --color-white:        #FFFFFF;
+
+  /* Semantic surface layers */
+  --color-surface-base:   var(--color-cream);     /* page background */
+  --color-surface-card:   #FFFFFF;                /* elevated cards */
+  --color-surface-offset: #F2EFE9;                /* subtle alternate row/section */
+  --color-surface-dark:   var(--color-forest);    /* inverted sections */
+  --color-border:         rgba(26, 26, 26, 0.10);
+  --color-border-strong:  rgba(26, 26, 26, 0.18);
+
+  /* Focus ring */
+  --color-focus-ring: var(--color-gold);
+
+  /* Font variables — values injected at runtime by next/font/google in layout.tsx */
+  --font-display: var(--font-cormorant), Georgia, 'Times New Roman', serif;
+  --font-body:    var(--font-inter), system-ui, -apple-system, sans-serif;
+
+  /* Fluid type scale — mirrors tailwind.config.ts fontSize for raw CSS use */
+  --text-display-xl: clamp(2.5rem, 6vw,   5rem);
+  --text-display-lg: clamp(2rem,   4vw,   3.5rem);
+  --text-display-md: clamp(1.5rem, 3vw,   2.5rem);
+  --text-xl:         clamp(1.25rem, 2vw,  1.75rem);
+  --text-lg:         clamp(1.0625rem, 1.5vw, 1.25rem);
+  --text-base:       1rem;      /* 16px — body copy floor */
+  --text-sm:         0.875rem;  /* 14px — UI labels, buttons */
+  --text-xs:         0.75rem;   /* 12px — absolute floor */
+
+  /* Spacing rhythm */
+  --section-padding-y: clamp(4rem, 8vw, 7rem);
+  --container-px:      clamp(1rem, 4vw, 3rem);
+  --container-max:     90rem;   /* 1440px — mirrors tailwind spacing.container */
+
+  /* Radius */
+  --radius-card:   1.25rem;   /* mirrors tailwind borderRadius.card */
+  --radius-btn:    0.625rem;  /* buttons */
+  --radius-input:  0.5rem;    /* form inputs */
+  --radius-pill:   9999px;    /* tags, badges */
+
+  /* Elevation shadows */
+  --shadow-card:       0 4px  24px 0 rgba(26, 26, 26, 0.08);
+  --shadow-card-hover: 0 8px  40px 0 rgba(26, 26, 26, 0.14);
+  --shadow-panel:      0 16px 48px 0 rgba(26, 26, 26, 0.12);
+  --shadow-dropdown:   0 4px  16px 0 rgba(26, 26, 26, 0.10);
+
+  /* Motion timing */
+  --ease-out-expo:   cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out:     cubic-bezier(0.4, 0, 0.2, 1);
+  --duration-fast:   150ms;
+  --duration-base:   250ms;
+  --duration-slow:   400ms;
+  --duration-reveal: 600ms;
 }
 
-html {
-  scroll-behavior: smooth;
+/* --------------------------------------------------------------------------
+ * Base reset + normalization
+ * ----------------------------------------------------------------------- */
+
+@layer base {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  html {
+    -moz-text-size-adjust: none;
+    -webkit-text-size-adjust: none;
+    text-size-adjust: none;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    scroll-behavior: smooth;
+    hanging-punctuation: first last;
+    /* Reserve space for sticky navbar so anchor jumps don't clip headings */
+    scroll-padding-top: 5rem;
+  }
+
+  body {
+    min-height: 100dvh;
+    font-family: var(--font-body);
+    font-size: var(--text-base);
+    line-height: 1.65;
+    color: var(--color-ink);
+    background-color: var(--color-surface-base);
+  }
+
+  /* ---- Media defaults ---- */
+  img,
+  picture,
+  video,
+  canvas,
+  svg {
+    display: block;
+    max-width: 100%;
+    height: auto;
+  }
+
+  /* ---- List resets (only when role is explicitly list) ---- */
+  ul[role='list'],
+  ol[role='list'] {
+    list-style: none;
+  }
+
+  /* ---- Form element inheritance ---- */
+  input,
+  button,
+  textarea,
+  select {
+    font: inherit;
+    color: inherit;
+  }
+
+  /* ---- Heading / prose wrapping ---- */
+  h1, h2, h3, h4, h5, h6 {
+    text-wrap: balance;
+    line-height: 1.15;
+  }
+
+  p, li, figcaption, blockquote {
+    text-wrap: pretty;
+    max-width: 72ch;
+  }
+
+  /* ---- Links ---- */
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  /* ---- Tables ---- */
+  table {
+    border-collapse: collapse;
+    width: 100%;
+  }
+
+  /* ---- Buttons ---- */
+  button {
+    cursor: pointer;
+    background: none;
+    border: none;
+  }
 }
 
-body {
-  margin: 0;
-  min-height: 100vh;
-  font-family: var(--font-inter), system-ui, sans-serif;
-  background-color: #FAF8F5;
-  color: #1A1A1A;
+/* --------------------------------------------------------------------------
+ * Typography defaults — headings use display font, body uses sans
+ * ----------------------------------------------------------------------- */
+
+@layer base {
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-display);
+    font-weight: 600;
+    color: var(--color-ink);
+    letter-spacing: -0.01em;
+  }
+
+  h1 { font-size: var(--text-display-xl); line-height: 1.1;  }
+  h2 { font-size: var(--text-display-lg); line-height: 1.15; }
+  h3 { font-size: var(--text-display-md); line-height: 1.2;  }
+  h4 { font-size: var(--text-xl);         line-height: 1.3;  font-family: var(--font-body); font-weight: 600; }
+  h5 { font-size: var(--text-lg);         line-height: 1.4;  font-family: var(--font-body); font-weight: 600; }
+  h6 { font-size: var(--text-base);       line-height: 1.5;  font-family: var(--font-body); font-weight: 600; }
+
+  p {
+    font-size: var(--text-base);
+    line-height: 1.7;
+    color: var(--color-ink);
+  }
+
+  strong {
+    font-weight: 600;
+  }
+
+  /* Inline links inside prose content */
+  article a,
+  .prose a {
+    color: var(--color-forest);
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+    transition: color var(--duration-fast) var(--ease-out-expo);
+  }
+
+  article a:hover,
+  .prose a:hover {
+    color: var(--color-forest-light);
+  }
 }
 
-* {
-  box-sizing: border-box;
+/* --------------------------------------------------------------------------
+ * Selection + focus styles
+ * ----------------------------------------------------------------------- */
+
+@layer base {
+  ::selection {
+    background-color: rgba(200, 169, 110, 0.25); /* brand-gold at 25% */
+    color: var(--color-ink);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-focus-ring);
+    outline-offset: 3px;
+    border-radius: var(--radius-input);
+  }
+
+  /* Remove default focus ring for mouse users; keep for keyboard */
+  :focus:not(:focus-visible) {
+    outline: none;
+  }
 }
 
-a {
-  color: inherit;
-  text-decoration: none;
+/* --------------------------------------------------------------------------
+ * Interactive element transitions
+ * Applied globally to all interactive elements.
+ * Specific components can override with their own transition values.
+ * ----------------------------------------------------------------------- */
+
+@layer base {
+  a,
+  button,
+  [role='button'],
+  [role='link'],
+  input,
+  textarea,
+  select {
+    transition:
+      color            var(--duration-fast) var(--ease-out-expo),
+      background-color var(--duration-fast) var(--ease-out-expo),
+      border-color     var(--duration-fast) var(--ease-out-expo),
+      box-shadow       var(--duration-base) var(--ease-out-expo),
+      opacity          var(--duration-fast) var(--ease-out-expo),
+      transform        var(--duration-fast) var(--ease-out-expo);
+  }
 }
 
-button,
-input,
-textarea,
-select {
-  font: inherit;
+/* --------------------------------------------------------------------------
+ * Reduced motion — respects OS accessibility preference
+ * All motion is disabled or minimised.
+ * ----------------------------------------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration:        0.01ms !important;
+    animation-iteration-count: 1      !important;
+    transition-duration:       0.01ms !important;
+    scroll-behavior:           auto   !important;
+  }
+}
+
+/* --------------------------------------------------------------------------
+ * Scroll-reveal animation utility
+ * Used by accepted section components for elegant entrance animations.
+ * Elements with [data-reveal] start hidden; JS adds [data-revealed] on
+ * IntersectionObserver trigger. Degrades gracefully if JS is absent
+ * (elements remain visible via the fallback below).
+ * ----------------------------------------------------------------------- */
+
+@layer utilities {
+  [data-reveal] {
+    opacity: 0;
+    transform: translateY(1.5rem);
+    transition:
+      opacity   var(--duration-reveal) var(--ease-out-expo),
+      transform var(--duration-reveal) var(--ease-out-expo);
+  }
+
+  [data-reveal='fade'] {
+    transform: none; /* fade only, no y movement */
+  }
+
+  [data-reveal='left'] {
+    transform: translateX(-1.5rem);
+  }
+
+  [data-reveal='right'] {
+    transform: translateX(1.5rem);
+  }
+
+  [data-reveal][data-revealed] {
+    opacity: 1;
+    transform: none;
+  }
+
+  /* Stagger delay helpers — add to child elements */
+  [data-reveal-delay='100'] { transition-delay: 100ms; }
+  [data-reveal-delay='200'] { transition-delay: 200ms; }
+  [data-reveal-delay='300'] { transition-delay: 300ms; }
+  [data-reveal-delay='400'] { transition-delay: 400ms; }
+  [data-reveal-delay='500'] { transition-delay: 500ms; }
+
+  /* Reduced motion: reveal immediately */
+  @media (prefers-reduced-motion: reduce) {
+    [data-reveal] {
+      opacity: 1;
+      transform: none;
+      transition: none;
+    }
+  }
+
+  /* No-JS fallback: if <html> has no-js class, show all revealed elements */
+  .no-js [data-reveal] {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* --------------------------------------------------------------------------
+ * Cookie banner slide-up animation
+ * Referenced by components/site/cookie-banner.tsx.
+ * ----------------------------------------------------------------------- */
+
+@layer utilities {
+  @keyframes slide-up-fade {
+    from {
+      opacity: 0;
+      transform: translateY(1rem);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate-slide-up {
+    animation: slide-up-fade var(--duration-slow) var(--ease-out-expo) both;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .animate-slide-up {
+      animation: none;
+      opacity: 1;
+      transform: none;
+    }
+  }
+}
+
+/* --------------------------------------------------------------------------
+ * Navbar backdrop blur — used by components/site/navbar.tsx
+ * ----------------------------------------------------------------------- */
+
+@layer utilities {
+  .navbar-blur {
+    backdrop-filter: blur(12px) saturate(180%);
+    -webkit-backdrop-filter: blur(12px) saturate(180%);
+  }
+}
+
+/* --------------------------------------------------------------------------
+ * Section container utility
+ * Standard horizontal padding + max-width centering used across all sections.
+ * ----------------------------------------------------------------------- */
+
+@layer components {
+  .section-container {
+    width: 100%;
+    max-width: var(--container-max);
+    margin-inline: auto;
+    padding-inline: var(--container-px);
+  }
+
+  .section-y {
+    padding-block: var(--section-padding-y);
+  }
+}
+
+/* --------------------------------------------------------------------------
+ * Prose / legal page utility — used by app/privacy-policy/page.tsx
+ * ----------------------------------------------------------------------- */
+
+@layer components {
+  .prose-legal {
+    font-family: var(--font-body);
+    font-size: var(--text-base);
+    line-height: 1.75;
+    color: var(--color-ink);
+  }
+
+  .prose-legal h2 {
+    font-family: var(--font-display);
+    font-size: var(--text-xl);
+    font-weight: 600;
+    color: var(--color-ink);
+    margin-top: 2.5rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .prose-legal p,
+  .prose-legal li {
+    color: var(--color-ink-muted);
+    margin-bottom: 0.75rem;
+  }
+
+  .prose-legal ul {
+    list-style: disc;
+    padding-left: 1.5rem;
+  }
+
+  .prose-legal a {
+    color: var(--color-forest);
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+}
+
+/* --------------------------------------------------------------------------
+ * Screen-reader only utility (Tailwind ships .sr-only, kept here as fallback)
+ * ----------------------------------------------------------------------- */
+
+@layer utilities {
+  .sr-only {
+    position:  absolute;
+    width:     1px;
+    height:    1px;
+    padding:   0;
+    margin:    -1px;
+    overflow:  hidden;
+    clip:      rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+  }
+
+  .not-sr-only {
+    position: static;
+    width:    auto;
+    height:   auto;
+    padding:  0;
+    margin:   0;
+    overflow: visible;
+    clip:     auto;
+    white-space: normal;
+  }
+}
+
+/* --------------------------------------------------------------------------
+ * Scrollbar styling — subtle, brand-consistent
+ * ----------------------------------------------------------------------- */
+
+@supports (scrollbar-width: thin) {
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-gold-dark) transparent;
+  }
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: var(--color-gold-dark);
+  border-radius: var(--radius-pill);
+}
+
+/* --------------------------------------------------------------------------
+ * Print styles — minimal, clean output for any printable legal page
+ * ----------------------------------------------------------------------- */
+
+@media print {
+  *,
+  *::before,
+  *::after {
+    background: transparent !important;
+    color: #000 !important;
+    box-shadow: none !important;
+  }
+
+  nav,
+  footer,
+  .cookie-banner,
+  [data-no-print] {
+    display: none !important;
+  }
+
+  body {
+    font-size: 12pt;
+    line-height: 1.5;
+  }
+
+  h1, h2, h3 {
+    page-break-after: avoid;
+  }
+
+  p, blockquote {
+    orphans: 3;
+    widows: 3;
+  }
 }
