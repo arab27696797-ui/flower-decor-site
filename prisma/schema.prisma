@@ -1,5 +1,37 @@
-// This is your Prisma schema file
-// Learn more about it here: https://pris.ly/d/prisma-schema
+// prisma/schema.prisma
+// PRIMA Decor — Production database schema for Railway PostgreSQL.
+//
+// MODELS SUMMARY:
+//   Lead           — submitted lead form records (core business data)
+//   PricingConfig  — singleton JSON document storing the full calculator
+//                    pricing configuration (replaces in-memory store in
+//                    app/api/admin/pricing/route.ts)
+//   PricingHistory — audit log of every pricing change (kept from v1 schema,
+//                    now references PricingConfig row instead of PricingRule rows)
+//   ContactsConfig — singleton JSON document storing public contact info
+//                    (replaces in-memory store in app/api/admin/contacts/route.ts)
+//   PortfolioItem  — portfolio images and optional video links for the gallery
+//                    (renamed from PortfolioImage, adds videoUrl and caption)
+//   AdminUser      — single admin user for the password-protected admin panel
+//                    (currently one row; extensible to multiple users later)
+//
+// REMOVED from v1 schema:
+//   SubscriptionTier — SaaS artefact, not relevant to this business.
+//
+// JSON FIELDS RATIONALE:
+//   The calculator pricing config is a deeply nested object defined by
+//   lib/calculator-config.ts. Normalising it into relational tables would
+//   require 5–8 tables and complex joins for every admin read/write.
+//   Storing it as a single JSON document in PricingConfig.data is pragmatic:
+//   - the entire config is always read and written atomically by the admin UI,
+//   - PostgreSQL's JSONB gives indexed access if needed later,
+//   - migration to normalised tables remains easy at any future stage.
+//   ContactsConfig.data is likewise a flat object — JSON keeps the route clean.
+//
+// SINGLETON PATTERN:
+//   PricingConfig and ContactsConfig use a fixed id = "singleton".
+//   Routes use prisma.pricingConfig.upsert({ where: { id: "singleton" }, ... }).
+//   This pattern avoids needing a separate "settings" indirection layer.
 
 generator client {
   provider = "prisma-client-js"
@@ -10,67 +42,182 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// ---------------------------------------------------------------------------
+// Lead — every submitted enquiry from the public lead form.
+// Sent to Telegram AND persisted here for admin record-keeping.
+// ---------------------------------------------------------------------------
+
 model Lead {
-  id            String    @id @default(uuid())
-  name          String
-  phone         String
-  eventType     String
-  desiredDate   DateTime
-  comment       String?
+  id String @id @default(uuid())
+
+  // Contact information
+  name  String
+  phone String
+
+  // Event context
+  eventLocation String  // venue / address where decoration is needed
+  eventType     String? // optional: wedding, corporate, entrance zone, etc.
+  desiredDate   DateTime?
+
+  // Calculator output: serialised CartItem[] from calculator-cart.ts.
+  // Stored as JSON so the full cart snapshot is preserved without schema changes
+  // if calculator categories are added or modified in future.
   cartItems     Json
 
-  utmSource     String?
-  utmMedium     String?
-  utmCampaign   String?
-  utmTerm       String?
-  utmContent    String?
-  referrerPage  String?
-  deviceType    String
+  // Approximate total as calculated (after 30% markup), in RUB.
+  // Stored as Int (kopecks are not used in this business).
+  totalEstimate Int
 
-  status        String    @default("new")
-  paymentStatus String    @default("unpaid")
-  paidAmount    Int?
+  // Free-text wishes / notes from the client.
+  comment String?
 
-  createdAt     DateTime  @default(now())
+  // UTM tracking — all optional, populated from URL params if present.
+  utmSource   String?
+  utmMedium   String?
+  utmCampaign String?
+  utmTerm     String?
+  utmContent  String?
+
+  // Referrer page for basic traffic analysis.
+  referrerPage String?
+
+  // Device type hint: "mobile" | "tablet" | "desktop"
+  deviceType String?
+
+  // Lead status for internal CRM workflow.
+  // Allowed values: "new" | "contacted" | "confirmed" | "closed" | "cancelled"
+  // Not enforced at DB level to allow easy status label changes without migration.
+  status String @default("new")
+
+  // Timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([createdAt])
+  @@index([status])
 }
 
-model PricingRule {
-  id             String    @id @default(uuid())
-  calcType       String
-  category       String
-  label          String
-  marketLo       Int
-  marketHi       Int
-  markupPercent  Float     @default(30)
-  artificialCoef Float     @default(0.6)
-  isActive       Boolean   @default(true)
-  updatedAt      DateTime  @updatedAt
-  updatedBy      String?
+// ---------------------------------------------------------------------------
+// PricingConfig — singleton document holding the full calculator pricing.
+// Replaces the in-memory store in app/api/admin/pricing/route.ts.
+//
+// Usage pattern in route handlers:
+//   const row = await prisma.pricingConfig.upsert({
+//     where:  { id: 'singleton' },
+//     update: { data: newConfig, updatedAt: new Date() },
+//     create: { id: 'singleton', data: defaultConfig },
+//   })
+// ---------------------------------------------------------------------------
+
+model PricingConfig {
+  id String @id @default("singleton")
+
+  // Full pricing configuration as defined by lib/calculator-config.ts.
+  // Shape: { floral: {...}, balloons: {...}, bouquet: {...}, event: {...}, markupPercent: number }
+  // Using Json (JSONB in PostgreSQL) for atomic read/write of the whole config.
+  data Json
+
+  // Audit fields
+  updatedAt DateTime @updatedAt
+  updatedBy String?  // admin username or "system"
 }
 
-model SubscriptionTier {
-  id              String   @id @default(uuid())
-  tierId          String
-  visitsPerMonth  Int      @default(4)
-  costPerVisit    Int
-  markupPercent   Float    @default(30)
-  zoneDescription String
-  isActive        Boolean  @default(true)
-}
+// ---------------------------------------------------------------------------
+// PricingHistory — append-only audit log of every admin pricing change.
+// Useful for rollback and accountability. Low volume (admin edits only).
+// ---------------------------------------------------------------------------
 
 model PricingHistory {
-  id        String    @id @default(uuid())
-  ruleId    String
-  oldValue  Json
-  newValue  Json
+  id String @id @default(uuid())
+
+  // Snapshot of the config before and after the change.
+  oldData Json
+  newData Json
+
+  // Who changed it and when.
   changedBy String?
-  changedAt DateTime  @default(now())
+  changedAt DateTime @default(now())
+
+  @@index([changedAt])
 }
 
-model PortfolioImage {
-  id        String   @id @default(uuid())
-  url       String
-  eventType String
-  sortOrder Int
-  isActive  Boolean  @default(true)
+// ---------------------------------------------------------------------------
+// ContactsConfig — singleton document holding public contact information.
+// Replaces the in-memory store in app/api/admin/contacts/route.ts.
+//
+// Shape of data field (ContactsConfig type from the route):
+//   {
+//     phoneDisplay:    string   // "+7 (999) 123-45-67"
+//     phoneTel:        string   // "+79991234567"
+//     telegramHandle:  string   // "prima_decor"
+//     whatsappNumber:  string   // "79991234567"
+//     email:           string   // optional
+//     instagramHandle: string   // optional
+//   }
+//
+// Usage pattern:
+//   await prisma.contactsConfig.upsert({
+//     where:  { id: 'singleton' },
+//     update: { data: newContacts },
+//     create: { id: 'singleton', data: defaultContacts },
+//   })
+// ---------------------------------------------------------------------------
+
+model ContactsConfig {
+  id String @id @default("singleton")
+
+  // Full contacts configuration as a flat JSON object.
+  data Json
+
+  updatedAt DateTime @updatedAt
+  updatedBy String?
+}
+
+// ---------------------------------------------------------------------------
+// PortfolioItem — gallery of completed works shown on the public site.
+// Replaces PortfolioImage from v1, adds caption and optional video support.
+// ---------------------------------------------------------------------------
+
+model PortfolioItem {
+  id String @id @default(uuid())
+
+  // Image URL — can be an external CDN URL or a /public-relative path.
+  imageUrl String
+
+  // Optional client video URL (YouTube embed, Vimeo, or direct .mp4 URL).
+  videoUrl String?
+
+  // Short caption shown below the image in the gallery, bilingual.
+  captionRu String?
+  captionEn String?
+
+  // Category tag for filtering: "floral" | "balloons" | "wedding" | "corporate" | "entrance" | "bouquet"
+  category String
+
+  // Display order in the gallery. Lower value = shown first.
+  sortOrder Int @default(0)
+
+  isActive Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([category])
+  @@index([isActive, sortOrder])
+}
+
+// ---------------------------------------------------------------------------
+// AdminUser — authenticated admin user(s) for the admin panel.
+// Currently designed for a single user but the table supports multiple rows.
+//
+// Password is stored as a bcrypt hash.
+// Authentication logic lives in app/api/admin/login/route.ts.
+// ---------------------------------------------------------------------------
+
+model AdminUser {
+  id           String   @id @default(uuid())
+  username     String   @unique
+  passwordHash String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
