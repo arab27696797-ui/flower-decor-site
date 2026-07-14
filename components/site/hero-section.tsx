@@ -20,7 +20,7 @@ import { useEffect, useRef } from 'react'
 
 import { MARKUP_MULTIPLIER } from '@/lib/calculator-config'
 import { useTranslations } from '@/lib/i18n'
-import { formatPrice, roundToHundreds } from '../../../app/lib/utils'
+import { formatPrice, roundToHundreds } from '@/app/lib/utils'
 
 // ---------------------------------------------------------------------------
 // Temporary hero image — replace with final asset when available.
