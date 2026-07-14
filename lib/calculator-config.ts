@@ -19,9 +19,7 @@ export interface SelectOption {
   value: string
   labelRu: string
   labelEn: string
-  /** Base price multiplier relative to the category base price. Default: 1. */
   multiplier?: number
-  /** Flat price override — when set, ignores multiplier and base price. */
   fixedPrice?: number
 }
 
@@ -35,7 +33,6 @@ export interface CategoryField {
   labelEn: string
   type: 'select' | 'number' | 'toggle'
   options?: SelectOption[]
-  /** For type "number": min / max / step */
   min?: number
   max?: number
   step?: number
@@ -47,11 +44,8 @@ export interface CategoryField {
 // ---------------------------------------------------------------------------
 
 export interface CategoryPricingConfig {
-  /** Minimum base price for this category in RUB */
   basePrice: number
-  /** Optional per-unit price when quantity makes sense */
   pricePerUnit?: number
-  /** Global markup coefficient applied to all estimates. E.g. 1.3 = 30 % */
   markupCoefficient: number
 }
 
@@ -73,7 +67,15 @@ export interface CategoryConfig {
 // Calculator cart types — shared with lead form and Telegram formatter
 // ---------------------------------------------------------------------------
 
-/** One resolved selection inside a category. */
+export interface SelectionEntry {
+  fieldId: string
+  labelRu: string
+  labelEn: string
+  selectedValue: string | number | boolean
+  selectedLabelRu: string
+  selectedLabelEn: string
+}
+
 export interface CategorySelection {
   fieldId: string
   labelRu: string
@@ -83,18 +85,16 @@ export interface CategorySelection {
   selectedLabelEn: string
 }
 
-/** One item in the estimate cart — one category result. */
 export interface CartItem {
-  id: string               // unique per cart entry, e.g. uuid or timestamp-based
+  id: string
   categoryId: CategoryId
   categoryLabelRu: string
-  categoryLabelEn: string
-  selections: CategorySelection[]
+  categoryLabelEn?: string
+  selections: SelectionEntry[]
   subtotalBeforeMarkup: number
   subtotalWithMarkup: number
 }
 
-/** Full estimate cart state passed to lead form and Telegram formatter. */
 export interface EstimateCart {
   items: CartItem[]
   totalBeforeMarkup: number
@@ -111,17 +111,26 @@ export function applyMarkup(base: number, coefficient: number): number {
 }
 
 // ---------------------------------------------------------------------------
+// Default markup coefficient (30 %)
+// ---------------------------------------------------------------------------
+
+export const DEFAULT_MARKUP = 1.3
+export const MARKUP_FACTOR = DEFAULT_MARKUP
+export const MARKUP_MULTIPLIER = DEFAULT_MARKUP
+
+// ---------------------------------------------------------------------------
 // Helper: compute cart totals from items
 // ---------------------------------------------------------------------------
 
 export function computeCartTotals(
   items: CartItem[],
-  markupCoefficient: number,
+  markupCoefficient: number = DEFAULT_MARKUP,
 ): Pick<EstimateCart, 'totalBeforeMarkup' | 'totalWithMarkup'> {
   const totalBeforeMarkup = items.reduce(
     (sum, item) => sum + item.subtotalBeforeMarkup,
     0,
   )
+
   return {
     totalBeforeMarkup,
     totalWithMarkup: applyMarkup(totalBeforeMarkup, markupCoefficient),
@@ -129,10 +138,25 @@ export function computeCartTotals(
 }
 
 // ---------------------------------------------------------------------------
-// Default markup coefficient (30 %)
+// Build full estimate cart from items
 // ---------------------------------------------------------------------------
 
-export const DEFAULT_MARKUP: number = 1.3
+export function buildEstimateCart(
+  items: CartItem[],
+  markupCoefficient: number = DEFAULT_MARKUP,
+): EstimateCart {
+  const { totalBeforeMarkup, totalWithMarkup } = computeCartTotals(
+    items,
+    markupCoefficient,
+  )
+
+  return {
+    items,
+    totalBeforeMarkup,
+    totalWithMarkup,
+    markupCoefficient,
+  }
+}
 
 // ---------------------------------------------------------------------------
 // Default pricing config per category
@@ -169,12 +193,12 @@ const floralFields: CategoryField[] = [
     labelEn: 'Event type',
     type: 'select',
     options: [
-      { value: 'wedding',    labelRu: 'Свадьба',              labelEn: 'Wedding',            multiplier: 1.4 },
-      { value: 'corporate',  labelRu: 'Корпоратив',           labelEn: 'Corporate event',    multiplier: 1.2 },
-      { value: 'birthday',   labelRu: 'День рождения',        labelEn: 'Birthday',           multiplier: 1.0 },
-      { value: 'entrance',   labelRu: 'Входная зона',         labelEn: 'Entrance zone',      multiplier: 1.1 },
-      { value: 'exhibition', labelRu: 'Выставка / презентация', labelEn: 'Exhibition',       multiplier: 1.15 },
-      { value: 'other',      labelRu: 'Другое',               labelEn: 'Other',              multiplier: 1.0 },
+      { value: 'wedding', labelRu: 'Свадьба', labelEn: 'Wedding', multiplier: 1.4 },
+      { value: 'corporate', labelRu: 'Корпоратив', labelEn: 'Corporate event', multiplier: 1.2 },
+      { value: 'birthday', labelRu: 'День рождения', labelEn: 'Birthday', multiplier: 1.0 },
+      { value: 'entrance', labelRu: 'Входная зона', labelEn: 'Entrance zone', multiplier: 1.1 },
+      { value: 'exhibition', labelRu: 'Выставка / презентация', labelEn: 'Exhibition', multiplier: 1.15 },
+      { value: 'other', labelRu: 'Другое', labelEn: 'Other', multiplier: 1.0 },
     ],
     defaultValue: 'wedding',
   },
@@ -184,9 +208,9 @@ const floralFields: CategoryField[] = [
     labelEn: 'Flower type',
     type: 'select',
     options: [
-      { value: 'artificial', labelRu: 'Искусственные',  labelEn: 'Artificial', multiplier: 0.85 },
-      { value: 'fresh',      labelRu: 'Живые',          labelEn: 'Fresh',      multiplier: 1.2 },
-      { value: 'mixed',      labelRu: 'Смешанные',      labelEn: 'Mixed',      multiplier: 1.05 },
+      { value: 'artificial', labelRu: 'Искусственные', labelEn: 'Artificial', multiplier: 0.85 },
+      { value: 'fresh', labelRu: 'Живые', labelEn: 'Fresh', multiplier: 1.2 },
+      { value: 'mixed', labelRu: 'Смешанные', labelEn: 'Mixed', multiplier: 1.05 },
     ],
     defaultValue: 'fresh',
   },
@@ -196,10 +220,10 @@ const floralFields: CategoryField[] = [
     labelEn: 'Decoration scale',
     type: 'select',
     options: [
-      { value: 'small',    labelRu: 'Небольшое (до 30 кв. м)',    labelEn: 'Small (up to 30 m²)',    multiplier: 0.8 },
-      { value: 'medium',   labelRu: 'Среднее (30–80 кв. м)',      labelEn: 'Medium (30–80 m²)',      multiplier: 1.0 },
-      { value: 'large',    labelRu: 'Большое (80–200 кв. м)',     labelEn: 'Large (80–200 m²)',      multiplier: 1.5 },
-      { value: 'xlarge',   labelRu: 'Масштабное (200+ кв. м)',    labelEn: 'Extra large (200+ m²)',  multiplier: 2.2 },
+      { value: 'small', labelRu: 'Небольшое (до 30 кв. м)', labelEn: 'Small (up to 30 m²)', multiplier: 0.8 },
+      { value: 'medium', labelRu: 'Среднее (30–80 кв. м)', labelEn: 'Medium (30–80 m²)', multiplier: 1.0 },
+      { value: 'large', labelRu: 'Большое (80–200 кв. м)', labelEn: 'Large (80–200 m²)', multiplier: 1.5 },
+      { value: 'xlarge', labelRu: 'Масштабное (200+ кв. м)', labelEn: 'Extra large (200+ m²)', multiplier: 2.2 },
     ],
     defaultValue: 'medium',
   },
@@ -209,9 +233,9 @@ const floralFields: CategoryField[] = [
     labelEn: 'Style / density',
     type: 'select',
     options: [
-      { value: 'minimal',  labelRu: 'Минималистичный',   labelEn: 'Minimal',   multiplier: 0.8 },
-      { value: 'standard', labelRu: 'Стандартный',       labelEn: 'Standard',  multiplier: 1.0 },
-      { value: 'lush',     labelRu: 'Пышный / роскошный', labelEn: 'Lush',    multiplier: 1.35 },
+      { value: 'minimal', labelRu: 'Минималистичный', labelEn: 'Minimal', multiplier: 0.8 },
+      { value: 'standard', labelRu: 'Стандартный', labelEn: 'Standard', multiplier: 1.0 },
+      { value: 'lush', labelRu: 'Пышный / роскошный', labelEn: 'Lush', multiplier: 1.35 },
     ],
     defaultValue: 'standard',
   },
@@ -228,11 +252,11 @@ const balloonFields: CategoryField[] = [
     labelEn: 'Event type',
     type: 'select',
     options: [
-      { value: 'wedding',   labelRu: 'Свадьба',        labelEn: 'Wedding',         multiplier: 1.3 },
-      { value: 'birthday',  labelRu: 'День рождения',  labelEn: 'Birthday',        multiplier: 1.0 },
-      { value: 'corporate', labelRu: 'Корпоратив',     labelEn: 'Corporate event', multiplier: 1.15 },
-      { value: 'kids',      labelRu: 'Детский праздник', labelEn: 'Kids party',    multiplier: 0.9 },
-      { value: 'other',     labelRu: 'Другое',         labelEn: 'Other',           multiplier: 1.0 },
+      { value: 'wedding', labelRu: 'Свадьба', labelEn: 'Wedding', multiplier: 1.3 },
+      { value: 'birthday', labelRu: 'День рождения', labelEn: 'Birthday', multiplier: 1.0 },
+      { value: 'corporate', labelRu: 'Корпоратив', labelEn: 'Corporate event', multiplier: 1.15 },
+      { value: 'kids', labelRu: 'Детский праздник', labelEn: 'Kids party', multiplier: 0.9 },
+      { value: 'other', labelRu: 'Другое', labelEn: 'Other', multiplier: 1.0 },
     ],
     defaultValue: 'birthday',
   },
@@ -242,9 +266,9 @@ const balloonFields: CategoryField[] = [
     labelEn: 'Scale',
     type: 'select',
     options: [
-      { value: 'small',   labelRu: 'Небольшое',          labelEn: 'Small',    multiplier: 0.7 },
-      { value: 'medium',  labelRu: 'Среднее',            labelEn: 'Medium',   multiplier: 1.0 },
-      { value: 'large',   labelRu: 'Большое',            labelEn: 'Large',    multiplier: 1.6 },
+      { value: 'small', labelRu: 'Небольшое', labelEn: 'Small', multiplier: 0.7 },
+      { value: 'medium', labelRu: 'Среднее', labelEn: 'Medium', multiplier: 1.0 },
+      { value: 'large', labelRu: 'Большое', labelEn: 'Large', multiplier: 1.6 },
     ],
     defaultValue: 'medium',
   },
@@ -254,9 +278,9 @@ const balloonFields: CategoryField[] = [
     labelEn: 'Composition complexity',
     type: 'select',
     options: [
-      { value: 'simple',   labelRu: 'Простая (арки, гирлянды)',  labelEn: 'Simple (arches, garlands)',  multiplier: 0.85 },
-      { value: 'medium',   labelRu: 'Средняя (колонны, панно)',  labelEn: 'Medium (columns, panels)',   multiplier: 1.0 },
-      { value: 'complex',  labelRu: 'Сложная (инсталляции)',     labelEn: 'Complex (installations)',    multiplier: 1.4 },
+      { value: 'simple', labelRu: 'Простая (арки, гирлянды)', labelEn: 'Simple (arches, garlands)', multiplier: 0.85 },
+      { value: 'medium', labelRu: 'Средняя (колонны, панно)', labelEn: 'Medium (columns, panels)', multiplier: 1.0 },
+      { value: 'complex', labelRu: 'Сложная (инсталляции)', labelEn: 'Complex (installations)', multiplier: 1.4 },
     ],
     defaultValue: 'medium',
   },
@@ -280,11 +304,11 @@ const bouquetFields: CategoryField[] = [
     labelEn: 'Occasion',
     type: 'select',
     options: [
-      { value: 'birthday',    labelRu: 'День рождения',  labelEn: 'Birthday',       multiplier: 1.0 },
-      { value: 'wedding',     labelRu: 'Свадьба',        labelEn: 'Wedding',        multiplier: 1.3 },
-      { value: 'anniversary', labelRu: 'Годовщина',      labelEn: 'Anniversary',    multiplier: 1.1 },
-      { value: 'corporate',   labelRu: 'Корпоративный',  labelEn: 'Corporate gift', multiplier: 1.05 },
-      { value: 'other',       labelRu: 'Другое',         labelEn: 'Other',          multiplier: 1.0 },
+      { value: 'birthday', labelRu: 'День рождения', labelEn: 'Birthday', multiplier: 1.0 },
+      { value: 'wedding', labelRu: 'Свадьба', labelEn: 'Wedding', multiplier: 1.3 },
+      { value: 'anniversary', labelRu: 'Годовщина', labelEn: 'Anniversary', multiplier: 1.1 },
+      { value: 'corporate', labelRu: 'Корпоративный', labelEn: 'Corporate gift', multiplier: 1.05 },
+      { value: 'other', labelRu: 'Другое', labelEn: 'Other', multiplier: 1.0 },
     ],
     defaultValue: 'birthday',
   },
@@ -294,10 +318,10 @@ const bouquetFields: CategoryField[] = [
     labelEn: 'Bouquet size',
     type: 'select',
     options: [
-      { value: 'small',   labelRu: 'Небольшой (15–20 стеблей)',  labelEn: 'Small (15–20 stems)',  fixedPrice: 15_000 },
-      { value: 'medium',  labelRu: 'Средний (25–35 стеблей)',    labelEn: 'Medium (25–35 stems)', fixedPrice: 22_000 },
-      { value: 'large',   labelRu: 'Большой (40–60 стеблей)',    labelEn: 'Large (40–60 stems)',  fixedPrice: 35_000 },
-      { value: 'premium', labelRu: 'Премиальный (60+ стеблей)',  labelEn: 'Premium (60+ stems)',  fixedPrice: 55_000 },
+      { value: 'small', labelRu: 'Небольшой (15–20 стеблей)', labelEn: 'Small (15–20 stems)', fixedPrice: 15_000 },
+      { value: 'medium', labelRu: 'Средний (25–35 стеблей)', labelEn: 'Medium (25–35 stems)', fixedPrice: 22_000 },
+      { value: 'large', labelRu: 'Большой (40–60 стеблей)', labelEn: 'Large (40–60 stems)', fixedPrice: 35_000 },
+      { value: 'premium', labelRu: 'Премиальный (60+ стеблей)', labelEn: 'Premium (60+ stems)', fixedPrice: 55_000 },
     ],
     defaultValue: 'small',
   },
@@ -314,9 +338,9 @@ const bouquetFields: CategoryField[] = [
     labelEn: 'Urgency',
     type: 'select',
     options: [
-      { value: 'standard', labelRu: 'Стандартная (1–2 дня)',    labelEn: 'Standard (1–2 days)',  multiplier: 1.0 },
-      { value: 'same_day', labelRu: 'В день обращения',         labelEn: 'Same day',             multiplier: 1.2 },
-      { value: 'express',  labelRu: 'Экспресс (2–4 часа)',      labelEn: 'Express (2–4 hours)',  multiplier: 1.4 },
+      { value: 'standard', labelRu: 'Стандартная (1–2 дня)', labelEn: 'Standard (1–2 days)', multiplier: 1.0 },
+      { value: 'same_day', labelRu: 'В день обращения', labelEn: 'Same day', multiplier: 1.2 },
+      { value: 'express', labelRu: 'Экспресс (2–4 часа)', labelEn: 'Express (2–4 hours)', multiplier: 1.4 },
     ],
     defaultValue: 'standard',
   },
@@ -333,13 +357,13 @@ const eventFields: CategoryField[] = [
     labelEn: 'Event type',
     type: 'select',
     options: [
-      { value: 'wedding',    labelRu: 'Свадьба',                        labelEn: 'Wedding',             multiplier: 1.5 },
-      { value: 'corporate',  labelRu: 'Корпоративное мероприятие',      labelEn: 'Corporate event',     multiplier: 1.3 },
-      { value: 'birthday',   labelRu: 'День рождения',                  labelEn: 'Birthday party',      multiplier: 1.0 },
-      { value: 'entrance',   labelRu: 'Входная / арочная зона',         labelEn: 'Entrance / arch zone', multiplier: 0.9 },
-      { value: 'exhibition', labelRu: 'Выставка / презентация',         labelEn: 'Exhibition / promo',  multiplier: 1.2 },
-      { value: 'gala',       labelRu: 'Гала-вечер / торжественный зал', labelEn: 'Gala / banquet',      multiplier: 1.6 },
-      { value: 'other',      labelRu: 'Другое',                         labelEn: 'Other',               multiplier: 1.0 },
+      { value: 'wedding', labelRu: 'Свадьба', labelEn: 'Wedding', multiplier: 1.5 },
+      { value: 'corporate', labelRu: 'Корпоративное мероприятие', labelEn: 'Corporate event', multiplier: 1.3 },
+      { value: 'birthday', labelRu: 'День рождения', labelEn: 'Birthday party', multiplier: 1.0 },
+      { value: 'entrance', labelRu: 'Входная / арочная зона', labelEn: 'Entrance / arch zone', multiplier: 0.9 },
+      { value: 'exhibition', labelRu: 'Выставка / презентация', labelEn: 'Exhibition / promo', multiplier: 1.2 },
+      { value: 'gala', labelRu: 'Гала-вечер / торжественный зал', labelEn: 'Gala / banquet', multiplier: 1.6 },
+      { value: 'other', labelRu: 'Другое', labelEn: 'Other', multiplier: 1.0 },
     ],
     defaultValue: 'wedding',
   },
@@ -349,11 +373,11 @@ const eventFields: CategoryField[] = [
     labelEn: 'Zone type',
     type: 'select',
     options: [
-      { value: 'full_hall',    labelRu: 'Весь зал',                labelEn: 'Full hall',             multiplier: 1.5 },
-      { value: 'photo_zone',   labelRu: 'Фотозона',                labelEn: 'Photo zone',            multiplier: 0.7 },
-      { value: 'entrance',     labelRu: 'Входная группа',          labelEn: 'Entrance group',        multiplier: 0.8 },
-      { value: 'table_decor',  labelRu: 'Столовая / банкетная зона', labelEn: 'Table / banquet area', multiplier: 1.0 },
-      { value: 'stage',        labelRu: 'Сцена / подиум',          labelEn: 'Stage / podium',        multiplier: 1.1 },
+      { value: 'full_hall', labelRu: 'Весь зал', labelEn: 'Full hall', multiplier: 1.5 },
+      { value: 'photo_zone', labelRu: 'Фотозона', labelEn: 'Photo zone', multiplier: 0.7 },
+      { value: 'entrance', labelRu: 'Входная группа', labelEn: 'Entrance group', multiplier: 0.8 },
+      { value: 'table_decor', labelRu: 'Столовая / банкетная зона', labelEn: 'Table / banquet area', multiplier: 1.0 },
+      { value: 'stage', labelRu: 'Сцена / подиум', labelEn: 'Stage / podium', multiplier: 1.1 },
     ],
     defaultValue: 'full_hall',
   },
@@ -363,10 +387,10 @@ const eventFields: CategoryField[] = [
     labelEn: 'Scale',
     type: 'select',
     options: [
-      { value: 'small',   labelRu: 'До 50 гостей',     labelEn: 'Up to 50 guests',    multiplier: 0.75 },
-      { value: 'medium',  labelRu: '50–150 гостей',    labelEn: '50–150 guests',      multiplier: 1.0 },
-      { value: 'large',   labelRu: '150–300 гостей',   labelEn: '150–300 guests',     multiplier: 1.5 },
-      { value: 'xlarge',  labelRu: '300+ гостей',      labelEn: '300+ guests',        multiplier: 2.0 },
+      { value: 'small', labelRu: 'До 50 гостей', labelEn: 'Up to 50 guests', multiplier: 0.75 },
+      { value: 'medium', labelRu: '50–150 гостей', labelEn: '50–150 guests', multiplier: 1.0 },
+      { value: 'large', labelRu: '150–300 гостей', labelEn: '150–300 guests', multiplier: 1.5 },
+      { value: 'xlarge', labelRu: '300+ гостей', labelEn: '300+ guests', multiplier: 2.0 },
     ],
     defaultValue: 'medium',
   },
@@ -376,9 +400,9 @@ const eventFields: CategoryField[] = [
     labelEn: 'Urgency',
     type: 'select',
     options: [
-      { value: 'standard', labelRu: 'Стандартная (от 3 дней)', labelEn: 'Standard (3+ days)',  multiplier: 1.0 },
-      { value: 'urgent',   labelRu: 'Срочная (24 часа)',       labelEn: 'Urgent (24 hours)',   multiplier: 1.25 },
-      { value: 'express',  labelRu: 'Экспресс (менее 12 ч)',   labelEn: 'Express (< 12 hours)', multiplier: 1.5 },
+      { value: 'standard', labelRu: 'Стандартная (от 3 дней)', labelEn: 'Standard (3+ days)', multiplier: 1.0 },
+      { value: 'urgent', labelRu: 'Срочная (24 часа)', labelEn: 'Urgent (24 hours)', multiplier: 1.25 },
+      { value: 'express', labelRu: 'Экспресс (менее 12 ч)', labelEn: 'Express (< 12 hours)', multiplier: 1.5 },
     ],
     defaultValue: 'standard',
   },
