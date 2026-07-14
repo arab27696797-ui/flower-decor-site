@@ -4,11 +4,11 @@ import { requireAdminAuth } from '@/lib/admin-auth'
 export default async function AdminDashboardPage() {
   await requireAdminAuth()
 
-  const [leadCount, portfolioCount, activeRulesCount, activeTierCount] = await Promise.all([
+  const [leadCount, activeLeadCount, portfolioCount, activePortfolioCount] = await Promise.all([
     prisma.lead.count(),
-    prisma.portfolioImage.count({ where: { isActive: true } }),
-    prisma.pricingRule.count({ where: { isActive: true } }),
-    prisma.subscriptionTier.count({ where: { isActive: true } }),
+    prisma.lead.count({ where: { status: 'new' } }),
+    prisma.portfolioItem.count(),
+    prisma.portfolioItem.count({ where: { isActive: true } }),
   ])
 
   return (
@@ -17,9 +17,9 @@ export default async function AdminDashboardPage() {
         <h1>Admin Dashboard</h1>
         <ul>
           <li>Total leads: {leadCount}</li>
-          <li>Active portfolio images: {portfolioCount}</li>
-          <li>Active pricing rules: {activeRulesCount}</li>
-          <li>Active subscription tiers: {activeTierCount}</li>
+          <li>New leads: {activeLeadCount}</li>
+          <li>Total portfolio items: {portfolioCount}</li>
+          <li>Active portfolio items: {activePortfolioCount}</li>
         </ul>
       </section>
     </main>
