@@ -1,16 +1,13 @@
 export const metadata = {
-  title: 'Privacy Policy',
-  description: 'Privacy Policy',
+  title: "Privacy Policy",
+  description: "Privacy Policy",
 }
 
 export default function PrivacyPolicyPage() {
-  const lastUpdated = '1 января 2025 года'
+  const lastUpdated = "1 января 2025 года"
 
   return (
-    <main
-      id="main-content"
-      className="mx-auto max-w-3xl px-4 py-14 sm:px-6 md:py-20"
-    >
+    <main id="main-content" className="mx-auto max-w-3xl px-4 py-14 sm:px-6 md:py-20">
       <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">
         Политика конфиденциальности
       </h1>
