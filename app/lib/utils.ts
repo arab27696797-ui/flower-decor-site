@@ -1,15 +1,6 @@
-export function cn(...classes: Array<string | false | null | undefined>) {
-  return classes.filter(Boolean).join(' ')
-}
+import { type ClassValue, clsx } from 'clsx'
+import { twMerge } from 'tailwind-merge'
 
-export function formatPrice(value: number, locale = 'ru-RU', currency = 'RUB') {
-  return new Intl.NumberFormat(locale, {
-    style: 'currency',
-    currency,
-    maximumFractionDigits: 0,
-  }).format(value)
-}
-
-export function roundToHundreds(value: number) {
-  return Math.round(value / 100) * 100
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs))
 }
