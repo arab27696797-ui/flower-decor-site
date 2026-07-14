@@ -20,7 +20,7 @@ export default async function AdminPricingHistoryPage() {
           {history.map((item) => (
             <li key={item.id}>
               <article>
-                <h2>Rule ID: {item.ruleId}</h2>
+                <h2>Change ID: {item.id}</h2>
                 <p>Changed by: {item.changedBy ?? 'unknown'}</p>
                 <p>Changed at: {item.changedAt.toISOString()}</p>
               </article>
