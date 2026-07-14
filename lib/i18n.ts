@@ -3,9 +3,10 @@
 // Supports 'ru' and 'en' locales. Designed to be forward-compatible
 // with Next.js route-based locale handling when needed.
 
-import { ru } from './translations/ru'
+import ru from './translations/ru'
 import { en } from './translations/en'
 import type { Translations } from './translations/ru'
+import { useState, useCallback } from 'react'
 
 // ---------------------------------------------------------------------------
 // Locale types and constants
@@ -66,10 +67,6 @@ export const LOCALE_HTML_LANG: Record<Locale, string> = {
 
 // ---------------------------------------------------------------------------
 // String interpolation helper — replaces {key} tokens in translated strings.
-//
-// Usage:
-//   interpolate(t.footer.copyright, { year: '2025' })
-//   // → '© 2025 Флоральный декор. Все права защищены.'
 // ---------------------------------------------------------------------------
 
 export function interpolate(
@@ -82,31 +79,11 @@ export function interpolate(
 }
 
 // ---------------------------------------------------------------------------
-// React hook — useTranslations
-//
-// Usage in a client component:
-//
-//   const { t, locale, setLocale } = useTranslations()
-//   // or with a locale prop drilled from a server component:
-//   const { t } = useTranslations(locale)
-//
-// The hook reads/writes locale from a module-level variable so it
-// persists across re-renders without requiring a Context provider.
-// This is intentional: the site is a single-language-at-a-time view.
-// If route-based locale is added later, replace the module variable
-// with a proper Context or zustand slice.
+// Module-level locale state
 // ---------------------------------------------------------------------------
 
-// Module-level current locale — shared across all hook calls.
-// Initialised from browser language preference when possible.
 let _currentLocale: Locale = DEFAULT_LOCALE
 
-/**
- * Initialise locale from browser / navigator preference.
- * Call once in the root client layout or _app equivalent.
- * Safe to call multiple times — subsequent calls are no-ops if
- * locale was already set by the user manually.
- */
 export function initLocaleFromBrowser(): void {
   if (typeof navigator === 'undefined') return
   const browserLang = navigator.language?.slice(0, 2).toLowerCase()
@@ -115,35 +92,17 @@ export function initLocaleFromBrowser(): void {
   }
 }
 
-/**
- * Imperatively read the current locale.
- * Useful in non-React contexts (e.g. the Telegram formatter, API helpers).
- */
 export function getCurrentLocale(): Locale {
   return _currentLocale
 }
 
-/**
- * Imperatively set the current locale.
- * Call from the language switcher onClick before triggering a re-render.
- */
 export function setCurrentLocale(locale: Locale): void {
   _currentLocale = locale
 }
 
 // ---------------------------------------------------------------------------
 // useTranslations React hook
-//
-// Two calling conventions:
-//   1. useTranslations()           — reads from module-level locale state
-//   2. useTranslations(locale)     — uses a fixed locale (server-component pattern)
 // ---------------------------------------------------------------------------
-
-// Lazy import of React hooks — avoids importing React in non-React files
-// that also import from lib/i18n.ts (e.g. lib/telegram.ts).
-// The hook itself is a named export; non-React callers use getTranslations() directly.
-
-import { useState, useCallback } from 'react'
 
 export function useTranslations(fixedLocale?: Locale): {
   t: Translations
@@ -159,7 +118,6 @@ export function useTranslations(fixedLocale?: Locale): {
     _currentLocale = next
     setLocaleState(next)
 
-    // Sync <html lang="..."> attribute for accessibility and SEO
     if (typeof document !== 'undefined') {
       document.documentElement.lang = LOCALE_HTML_LANG[next]
     }
@@ -173,15 +131,7 @@ export function useTranslations(fixedLocale?: Locale): {
 }
 
 // ---------------------------------------------------------------------------
-// Server-side helper — resolves locale from Next.js params or searchParams.
-//
-// Usage in a Next.js Server Component:
-//
-//   // app/[locale]/page.tsx
-//   export default function Page({ params }: { params: { locale: string } }) {
-//     const t = getTranslationsForPage(params.locale)
-//     return <HeroSection t={t} />
-//   }
+// Server-side helper
 // ---------------------------------------------------------------------------
 
 export function getTranslationsForPage(localeParam: string | undefined): Translations {
@@ -189,7 +139,7 @@ export function getTranslationsForPage(localeParam: string | undefined): Transla
 }
 
 // ---------------------------------------------------------------------------
-// Locale toggle helper — returns the other locale (for the language switcher)
+// Locale toggle helper
 // ---------------------------------------------------------------------------
 
 export function toggleLocale(current: Locale): Locale {
@@ -197,10 +147,7 @@ export function toggleLocale(current: Locale): Locale {
 }
 
 // ---------------------------------------------------------------------------
-// SEO helpers — canonical locale path prefix
-//
-// Currently returns '' for 'ru' (default, no prefix) and '/en' for 'en'.
-// Adjust when route-based locale is implemented.
+// SEO helpers
 // ---------------------------------------------------------------------------
 
 export function getLocalePathPrefix(locale: Locale): string {
@@ -212,7 +159,6 @@ export function getAlternateLocaleHref(
   targetLocale: Locale,
 ): string {
   const prefix = getLocalePathPrefix(targetLocale)
-  // Strip existing locale prefix before adding the new one
   const cleanPath = currentPath.replace(/^\/(ru|en)/, '')
   return `${prefix}${cleanPath || '/'}`
 }
