@@ -49,7 +49,7 @@
   # `npx` is used so the exact version from package.json is always used,
   # regardless of any globally installed Prisma CLI on the build runner.
   builder     = "NIXPACKS"
-  buildCommand = "npx prisma generate && npx next build && cp -r .next/static .next/standalone/.next/static && cp -r public .next/standalone/public"
+  buildCommand = "npx prisma generate && npx next build && cp -r .next/static .next/standalone/.next/static"
 
 [deploy]
   # Start the standalone Next.js server produced by `output: 'standalone'`
