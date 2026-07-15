@@ -256,9 +256,9 @@ export default function AdminPricingPage() {
   // ---- Typed setters for nested config fields ----
   // These helpers produce a new config object on each change (immutable updates).
 
-  function setFloral<K extends keyof PricingConfig['floral']>(
-    key: K,
-    subKey: keyof PricingConfig['floral'][K],
+  function setFloral(
+    key: keyof PricingConfig['floral'] & string,
+    subKey: string,
     val: number
   ) {
     if (!config) return
@@ -266,14 +266,14 @@ export default function AdminPricingPage() {
       ...config,
       floral: {
         ...config.floral,
-        [key]: { ...(config.floral[key] as object), [subKey]: val },
+        [key]: { ...(config.floral[key] as Record<string, number>), [subKey]: val },
       },
     })
   }
 
-  function setBalloons<K extends keyof PricingConfig['balloons']>(
-    key: K,
-    subKey: keyof PricingConfig['balloons'][K],
+  function setBalloons(
+    key: keyof PricingConfig['balloons'] & string,
+    subKey: string,
     val: number
   ) {
     if (!config) return
@@ -281,14 +281,14 @@ export default function AdminPricingPage() {
       ...config,
       balloons: {
         ...config.balloons,
-        [key]: { ...(config.balloons[key] as object), [subKey]: val },
+        [key]: { ...(config.balloons[key] as Record<string, number>), [subKey]: val },
       },
     })
   }
 
-  function setBouquet<K extends keyof PricingConfig['bouquet']>(
-    key: K,
-    subKey: keyof PricingConfig['bouquet'][K],
+  function setBouquet(
+    key: keyof Omit<PricingConfig['bouquet'], 'balloonAddon'> & string,
+    subKey: string,
     val: number
   ) {
     if (!config) return
@@ -296,14 +296,14 @@ export default function AdminPricingPage() {
       ...config,
       bouquet: {
         ...config.bouquet,
-        [key]: { ...(config.bouquet[key] as object), [subKey]: val },
+        [key]: { ...(config.bouquet[key] as Record<string, number>), [subKey]: val },
       },
     })
   }
 
-  function setEvent<K extends keyof PricingConfig['event']>(
-    key: K,
-    subKey: keyof PricingConfig['event'][K],
+  function setEvent(
+    key: keyof PricingConfig['event'] & string,
+    subKey: string,
     val: number
   ) {
     if (!config) return
@@ -311,7 +311,7 @@ export default function AdminPricingPage() {
       ...config,
       event: {
         ...config.event,
-        [key]: { ...(config.event[key] as object), [subKey]: val },
+        [key]: { ...(config.event[key] as Record<string, number>), [subKey]: val },
       },
     })
   }
