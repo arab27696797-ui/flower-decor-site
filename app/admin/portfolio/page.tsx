@@ -109,7 +109,7 @@ export default async function AdminPortfolioPage() {
     id: item.id,
     category: item.category,
     imageUrl: item.imageUrl,
-    captionRu: item.captionRu,
+    captionRu: item.captionRu ?? '',
     sortOrder: item.sortOrder,
     isActive: item.isActive,
   }))
