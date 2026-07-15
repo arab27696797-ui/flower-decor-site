@@ -1,5 +1,5 @@
 // app/admin/contacts/page.tsx
-// PRIMA Decor — Admin: Public Contact Information Editor.
+// Si-Si — Admin: Public Contact Information Editor.
 //
 // ARCHITECTURE STATUS:
 // No contacts persistence API exists yet in this project.
@@ -24,10 +24,10 @@ import React, { useState } from 'react'
 type ContactsConfig = {
   phoneDisplay: string      // Human-readable display: "+7 (999) 123-45-67"
   phoneTel: string          // tel: href value: "+79991234567"
-  telegramHandle: string    // without @: "prima_decor"
+  telegramHandle: string    // without @: "si-si"
   whatsappNumber: string    // international digits only: "79991234567"
   email: string
-  instagramHandle: string   // without @: "prima.decor"
+  instagramHandle: string   // without @: "si-si.decor"
 }
 
 type SaveState = 'idle' | 'saving' | 'saved' | 'error'
@@ -40,10 +40,10 @@ type SaveState = 'idle' | 'saving' | 'saved' | 'error'
 const DEFAULT_CONTACTS: ContactsConfig = {
   phoneDisplay: '+7 (999) 123-45-67',
   phoneTel: '+79991234567',
-  telegramHandle: 'prima_decor',
+  telegramHandle: 'si-si',
   whatsappNumber: '79991234567',
-  email: 'info@prima-decor.ru',
-  instagramHandle: 'prima.decor',
+  email: 'info@si-si.ru',
+  instagramHandle: 'si-si.decor',
 }
 
 // ---------------------------------------------------------------------------
@@ -465,8 +465,8 @@ export default function AdminContactsPage() {
           value={data.telegramHandle}
           onChange={(v) => setField('telegramHandle', v)}
           prefix="@"
-          placeholder="prima_decor"
-          description="Без символа @. Ссылка: t.me/prima_decor"
+          placeholder="si-si"
+          description="Без символа @. Ссылка: t.me/si-si"
           error={errors.telegramHandle}
         />
         <ContactField
@@ -494,7 +494,7 @@ export default function AdminContactsPage() {
           value={data.email}
           onChange={(v) => setField('email', v)}
           type="email"
-          placeholder="info@prima-decor.ru"
+          placeholder="info@si-si.ru"
           description="Деловая почта для клиентов (необязательно)"
           error={errors.email}
           autoComplete="email"
@@ -505,7 +505,7 @@ export default function AdminContactsPage() {
           value={data.instagramHandle}
           onChange={(v) => setField('instagramHandle', v)}
           prefix="@"
-          placeholder="prima.decor"
+          placeholder="si-si.decor"
           description="Без символа @. Необязательно."
           error={errors.instagramHandle}
         />
