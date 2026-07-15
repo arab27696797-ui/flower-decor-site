@@ -19,35 +19,7 @@ const CONTACT_TELEGRAM_HANDLE = 'si-si_msk'
 const CONTACT_WHATSAPP_NUMBER = '79990000000'
 const CONTACT_EMAIL           = 'info@si-si.ru'
 
-// ---------------------------------------------------------------------------
-// Inline SVG logo mark — same as navbar, no external dep
-// ---------------------------------------------------------------------------
 
-function SiSiLogoMark({ className = '' }: { className?: string }) {
-  return (
-    <svg
-      viewBox="0 0 32 32"
-      fill="none"
-      aria-hidden="true"
-      className={className}
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <rect x="8" y="6" width="2.5" height="20" rx="1.25" fill="currentColor" />
-      <path
-        d="M10.5 6.5 C10.5 6.5 22 6 22 12.5 C22 19 10.5 18.5 10.5 18.5"
-        stroke="currentColor"
-        strokeWidth="2.5"
-        strokeLinecap="round"
-        fill="none"
-      />
-      <circle cx="22" cy="12.5" r="2" fill="currentColor" opacity="0.35" />
-    </svg>
-  )
-}
-
-// ---------------------------------------------------------------------------
-// Inline SVG social icons
-// ---------------------------------------------------------------------------
 
 function IconTelegram() {
   return (
@@ -228,7 +200,6 @@ export function Footer() {
                 focus-visible:ring-brand-gold rounded
               "
             >
-              <SiSiLogoMark className="h-8 w-8" />
               <span className="font-display text-base font-semibold tracking-wide">
                 Si-Si
               </span>

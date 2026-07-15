@@ -35,36 +35,6 @@ const CONTACT_PHONE_DISPLAY = '+7 (999) 000-00-00'
 const CONTACT_PHONE_TEL     = '+79990000000'
 
 // ---------------------------------------------------------------------------
-// Inline SVG logo mark — geometric floral monogram "P"
-// Monochrome, works at 24px and 200px, uses currentColor.
-// ---------------------------------------------------------------------------
-
-function SiSiLogoMark({ className = '' }: { className?: string }) {
-  return (
-    <svg
-      viewBox="0 0 32 32"
-      fill="none"
-      aria-hidden="true"
-      className={className}
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      {/* Stem */}
-      <rect x="8" y="6" width="2.5" height="20" rx="1.25" fill="currentColor" />
-      {/* Petal arc top */}
-      <path
-        d="M10.5 6.5 C10.5 6.5 22 6 22 12.5 C22 19 10.5 18.5 10.5 18.5"
-        stroke="currentColor"
-        strokeWidth="2.5"
-        strokeLinecap="round"
-        fill="none"
-      />
-      {/* Small decorative petal hint */}
-      <circle cx="22" cy="12.5" r="2" fill="currentColor" opacity="0.35" />
-    </svg>
-  )
-}
-
-// ---------------------------------------------------------------------------
 // Hamburger icon — animated open/close
 // ---------------------------------------------------------------------------
 
@@ -193,7 +163,6 @@ export function Navbar() {
             focus-visible:ring-2 focus-visible:ring-brand-gold rounded
           "
         >
-          <SiSiLogoMark className="h-8 w-8 text-brand-forest" />
           <span className="font-display text-lg font-semibold tracking-tight text-brand-forest leading-none">
             Si-<span className="font-light ml-1 text-brand-gold">Si</span>
           </span>
