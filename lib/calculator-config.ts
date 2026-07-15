@@ -63,9 +63,31 @@ export interface CategoryConfig {
   pricing: CategoryPricingConfig
 }
 
-// ---------------------------------------------------------------------------
-// Calculator cart types — shared with lead form and Telegram formatter
-// ---------------------------------------------------------------------------
+export type PricingConfig = {
+  markupMultiplier: number
+  floral: {
+    baseByScale: { small: number; medium: number; large: number }
+    typeMultiplierDelta: { artificial: number; mixed: number }
+    densitySurcharge: { dense: number }
+  }
+  balloons: {
+    baseByScale: { small: number; medium: number; large: number }
+    compositionSurcharge: { complex: number }
+    addonPrice: { flowers: number }
+  }
+  bouquet: {
+    baseBySize: { small: number; medium: number; large: number }
+    urgencySurcharge: { urgent: number }
+    balloonAddon: number
+  }
+  event: {
+    baseByZone: { entrance: number; banquet: number; wedding: number; corporate: number }
+    urgencySurcharge: { rush: number }
+    scaleSurcharge: { large: number }
+  }
+}
+
+export type CategoryPricing = PricingConfig['floral'] | PricingConfig['balloons'] | PricingConfig['bouquet'] | PricingConfig['event']
 
 export interface SelectionEntry {
   fieldId: string
@@ -87,11 +109,12 @@ export interface CategorySelection {
 
 export interface CartItem {
   id: string
-  categoryId: CategoryId
+  categoryId: CategoryId | string
   categoryLabelRu: string
   categoryLabelEn?: string
   selections: SelectionEntry[]
-  subtotalBeforeMarkup: number
+  basePrice?: number
+  subtotalBeforeMarkup?: number
   subtotalWithMarkup: number
 }
 
@@ -102,17 +125,9 @@ export interface EstimateCart {
   markupCoefficient: number
 }
 
-// ---------------------------------------------------------------------------
-// Helper: compute marked-up price
-// ---------------------------------------------------------------------------
-
 export function applyMarkup(base: number, coefficient: number): number {
   return Math.round(base * coefficient)
 }
-
-// ---------------------------------------------------------------------------
-// Default markup coefficient (30 %)
-// ---------------------------------------------------------------------------
 
 export const DEFAULT_MARKUP = 1.3
 export const MARKUP_FACTOR = DEFAULT_MARKUP
@@ -127,7 +142,7 @@ export function computeCartTotals(
   markupCoefficient: number = DEFAULT_MARKUP,
 ): Pick<EstimateCart, 'totalBeforeMarkup' | 'totalWithMarkup'> {
   const totalBeforeMarkup = items.reduce(
-    (sum, item) => sum + item.subtotalBeforeMarkup,
+    (sum, item) => sum + (item.subtotalBeforeMarkup ?? item.basePrice ?? 0),
     0,
   )
 
@@ -179,6 +194,30 @@ export const DEFAULT_PRICING: Record<CategoryId, CategoryPricingConfig> = {
   event: {
     basePrice: 30_000,
     markupCoefficient: DEFAULT_MARKUP,
+  },
+}
+
+export const DEFAULT_ADMIN_PRICING: PricingConfig = {
+  markupMultiplier: DEFAULT_MARKUP,
+  floral: {
+    baseByScale: { small: 8_000, medium: 15_000, large: 25_000 },
+    typeMultiplierDelta: { artificial: 0, mixed: 1_000 },
+    densitySurcharge: { dense: 3_000 },
+  },
+  balloons: {
+    baseByScale: { small: 5_000, medium: 9_000, large: 16_000 },
+    compositionSurcharge: { complex: 2_500 },
+    addonPrice: { flowers: 2_000 },
+  },
+  bouquet: {
+    baseBySize: { small: 7_000, medium: 12_000, large: 18_000 },
+    urgencySurcharge: { urgent: 3_000 },
+    balloonAddon: 1_500,
+  },
+  event: {
+    baseByZone: { entrance: 12_000, banquet: 25_000, wedding: 35_000, corporate: 30_000 },
+    urgencySurcharge: { rush: 5_000 },
+    scaleSurcharge: { large: 8_000 },
   },
 }
 
