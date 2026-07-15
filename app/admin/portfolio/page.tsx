@@ -7,44 +7,44 @@ import { AdminPageHeader } from '@/components/admin/admin-page-header'
 import { AdminSectionCard } from '@/components/admin/admin-section-card'
 import { requireAdminAuth } from '@/lib/admin-auth'
 import { prisma } from '@/lib/prisma'
-import {
-  createPortfolioImageSchema,
-  updatePortfolioImageSchema,
-} from '@/lib/zod'
 
 type PortfolioTableRow = {
   id: string
-  eventType: string
-  url: string
+  category: string
+  imageUrl: string
+  captionRu: string
   sortOrder: number
   isActive: boolean
 }
 
-async function createPortfolioImageAction(formData: FormData) {
+async function createPortfolioItemAction(formData: FormData) {
   'use server'
 
   await requireAdminAuth()
 
-  const parsed = createPortfolioImageSchema.safeParse({
-    url: formData.get('url'),
-    eventType: formData.get('eventType'),
-    sortOrder: Number(formData.get('sortOrder')),
-    isActive: formData.get('isActive') === 'true',
-  })
+  const imageUrl = String(formData.get('imageUrl') ?? '').trim()
+  const category = String(formData.get('category') ?? '').trim()
+  const captionRu = String(formData.get('captionRu') ?? '').trim()
+  const captionEn = String(formData.get('captionEn') ?? '').trim()
+  const sortOrder = Number(formData.get('sortOrder') ?? 0)
+  const isActive = formData.get('isActive') === 'true'
 
-  if (!parsed.success) {
+  if (!imageUrl || !category || !captionRu || Number.isNaN(sortOrder)) {
     return {
       ok: false as const,
-      error: 'Проверьте ссылку, тип события и порядок сортировки.',
+      error: 'Проверьте ссылку, категорию, подпись и порядок сортировки.',
     }
   }
 
-  await prisma.portfolioImage.create({
+  await prisma.portfolioItem.create({
     data: {
-      url: parsed.data.url,
-      eventType: parsed.data.eventType,
-      sortOrder: parsed.data.sortOrder,
-      isActive: parsed.data.isActive,
+      imageUrl,
+      videoUrl: null,
+      category,
+      captionRu,
+      captionEn: captionEn || captionRu,
+      sortOrder,
+      isActive,
     },
   })
 
@@ -56,35 +56,37 @@ async function createPortfolioImageAction(formData: FormData) {
   }
 }
 
-async function updatePortfolioImageAction(formData: FormData) {
+async function updatePortfolioItemAction(formData: FormData) {
   'use server'
 
   await requireAdminAuth()
 
-  const parsed = updatePortfolioImageSchema.safeParse({
-    id: formData.get('id'),
-    url: formData.get('url'),
-    eventType: formData.get('eventType'),
-    sortOrder: Number(formData.get('sortOrder')),
-    isActive: formData.get('isActive') === 'true',
-  })
+  const id = String(formData.get('id') ?? '').trim()
+  const imageUrl = String(formData.get('imageUrl') ?? '').trim()
+  const category = String(formData.get('category') ?? '').trim()
+  const captionRu = String(formData.get('captionRu') ?? '').trim()
+  const captionEn = String(formData.get('captionEn') ?? '').trim()
+  const sortOrder = Number(formData.get('sortOrder') ?? 0)
+  const isActive = formData.get('isActive') === 'true'
 
-  if (!parsed.success) {
+  if (!id || !imageUrl || !category || !captionRu || Number.isNaN(sortOrder)) {
     return {
       ok: false as const,
       error: 'Не удалось обновить запись. Проверьте поля формы.',
     }
   }
 
-  await prisma.portfolioImage.update({
+  await prisma.portfolioItem.update({
     where: {
-      id: parsed.data.id,
+      id,
     },
     data: {
-      url: parsed.data.url,
-      eventType: parsed.data.eventType,
-      sortOrder: parsed.data.sortOrder,
-      isActive: parsed.data.isActive,
+      imageUrl,
+      category,
+      captionRu,
+      captionEn: captionEn || captionRu,
+      sortOrder,
+      isActive,
     },
   })
 
@@ -99,16 +101,17 @@ async function updatePortfolioImageAction(formData: FormData) {
 export default async function AdminPortfolioPage() {
   await requireAdminAuth()
 
-  const images = await prisma.portfolioImage.findMany({
-    orderBy: [{ eventType: 'asc' }, { sortOrder: 'asc' }, { id: 'asc' }],
+  const items = await prisma.portfolioItem.findMany({
+    orderBy: [{ category: 'asc' }, { sortOrder: 'asc' }, { id: 'asc' }],
   })
 
-  const rows: PortfolioTableRow[] = images.map((image) => ({
-    id: image.id,
-    eventType: image.eventType,
-    url: image.url,
-    sortOrder: image.sortOrder,
-    isActive: image.isActive,
+  const rows: PortfolioTableRow[] = items.map((item) => ({
+    id: item.id,
+    category: item.category,
+    imageUrl: item.imageUrl,
+    captionRu: item.captionRu,
+    sortOrder: item.sortOrder,
+    isActive: item.isActive,
   }))
 
   return (
@@ -116,23 +119,23 @@ export default async function AdminPortfolioPage() {
       <AdminPageHeader
         eyebrow="Контент"
         title="Портфолио"
-        description="Управляйте изображениями для сайта и презентационных материалов. В этом разделе уже можно добавлять и редактировать записи без смены общей архитектуры."
+        description="Управляйте изображениями для сайта и презентационных материалов. Раздел приведён в соответствие с текущей схемой базы данных."
       />
 
       <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_320px] xl:items-start">
         <div className="flex flex-col gap-6">
           <AdminSectionCard
-            title="Добавить изображение"
-            description="Новая запись сразу попадёт в административный список. Публичный API по-прежнему отдаёт только активные изображения."
+            title="Добавить элемент портфолио"
+            description="Новая запись сразу попадёт в административный список. На сайт выводятся только активные элементы."
           >
-            <form action={createPortfolioImageAction} className="grid gap-4 md:grid-cols-2">
+            <form action={createPortfolioItemAction} className="grid gap-4 md:grid-cols-2">
               <div className="md:col-span-2">
-                <label htmlFor="url" className="text-sm font-medium leading-6 text-brand-ink">
+                <label htmlFor="imageUrl" className="text-sm font-medium leading-6 text-brand-ink">
                   Ссылка на изображение
                 </label>
                 <input
-                  id="url"
-                  name="url"
+                  id="imageUrl"
+                  name="imageUrl"
                   type="url"
                   required
                   placeholder="https://example.com/portfolio-image.jpg"
@@ -141,15 +144,15 @@ export default async function AdminPortfolioPage() {
               </div>
 
               <div>
-                <label htmlFor="eventType" className="text-sm font-medium leading-6 text-brand-ink">
-                  Тип события
+                <label htmlFor="category" className="text-sm font-medium leading-6 text-brand-ink">
+                  Категория
                 </label>
                 <input
-                  id="eventType"
-                  name="eventType"
+                  id="category"
+                  name="category"
                   type="text"
                   required
-                  placeholder="Свадьба"
+                  placeholder="wedding"
                   className="mt-2 w-full rounded-card border border-brand-ink/10 bg-white px-4 py-3 text-sm text-brand-ink shadow-sm transition-colors duration-200 placeholder:text-brand-ink/35 focus:border-brand-gold/60 focus:outline-none focus:ring-2 focus:ring-brand-gold/40"
                 />
               </div>
@@ -165,6 +168,33 @@ export default async function AdminPortfolioPage() {
                   min={0}
                   defaultValue={0}
                   required
+                  className="mt-2 w-full rounded-card border border-brand-ink/10 bg-white px-4 py-3 text-sm text-brand-ink shadow-sm transition-colors duration-200 placeholder:text-brand-ink/35 focus:border-brand-gold/60 focus:outline-none focus:ring-2 focus:ring-brand-gold/40"
+                />
+              </div>
+
+              <div className="md:col-span-2">
+                <label htmlFor="captionRu" className="text-sm font-medium leading-6 text-brand-ink">
+                  Подпись RU
+                </label>
+                <input
+                  id="captionRu"
+                  name="captionRu"
+                  type="text"
+                  required
+                  placeholder="Свадебное оформление"
+                  className="mt-2 w-full rounded-card border border-brand-ink/10 bg-white px-4 py-3 text-sm text-brand-ink shadow-sm transition-colors duration-200 placeholder:text-brand-ink/35 focus:border-brand-gold/60 focus:outline-none focus:ring-2 focus:ring-brand-gold/40"
+                />
+              </div>
+
+              <div className="md:col-span-2">
+                <label htmlFor="captionEn" className="text-sm font-medium leading-6 text-brand-ink">
+                  Подпись EN
+                </label>
+                <input
+                  id="captionEn"
+                  name="captionEn"
+                  type="text"
+                  placeholder="Wedding decor"
                   className="mt-2 w-full rounded-card border border-brand-ink/10 bg-white px-4 py-3 text-sm text-brand-ink shadow-sm transition-colors duration-200 placeholder:text-brand-ink/35 focus:border-brand-gold/60 focus:outline-none focus:ring-2 focus:ring-brand-gold/40"
                 />
               </div>
@@ -189,7 +219,7 @@ export default async function AdminPortfolioPage() {
                   type="submit"
                   className="inline-flex min-h-11 items-center justify-center rounded-card bg-brand-forest px-5 py-3 text-sm font-semibold text-white transition-colors duration-200 hover:bg-brand-forest/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-gold/70 focus-visible:ring-offset-2 focus-visible:ring-offset-brand-cream"
                 >
-                  Добавить изображение
+                  Добавить элемент
                 </button>
                 <p className="text-sm leading-6 text-brand-ink/65">
                   После сохранения страница обновится, и новая запись появится в таблице.
@@ -200,12 +230,12 @@ export default async function AdminPortfolioPage() {
 
           <AdminSectionCard
             title="Редактирование записей"
-            description="Здесь можно обновить ссылку, тип события, порядок сортировки и видимость каждой записи."
+            description="Здесь можно обновить ссылку, категорию, подписи, порядок сортировки и видимость каждой записи."
           >
             {rows.length === 0 ? (
               <AdminEmptyState
                 title="Портфолио пока пустое"
-                description="Сначала добавьте хотя бы одно изображение, чтобы появились формы редактирования."
+                description="Сначала добавьте хотя бы один элемент, чтобы появились формы редактирования."
                 tone="soft"
               />
             ) : (
@@ -213,7 +243,7 @@ export default async function AdminPortfolioPage() {
                 {rows.map((row) => (
                   <form
                     key={row.id}
-                    action={updatePortfolioImageAction}
+                    action={updatePortfolioItemAction}
                     className="rounded-card border border-brand-ink/10 bg-white/80 p-4 shadow-sm"
                   >
                     <input type="hidden" name="id" value={row.id} />
@@ -221,16 +251,16 @@ export default async function AdminPortfolioPage() {
                     <div className="grid gap-4 md:grid-cols-2">
                       <div className="md:col-span-2">
                         <label
-                          htmlFor={`url-${row.id}`}
+                          htmlFor={`imageUrl-${row.id}`}
                           className="text-sm font-medium leading-6 text-brand-ink"
                         >
                           Ссылка на изображение
                         </label>
                         <input
-                          id={`url-${row.id}`}
-                          name="url"
+                          id={`imageUrl-${row.id}`}
+                          name="imageUrl"
                           type="url"
-                          defaultValue={row.url}
+                          defaultValue={row.imageUrl}
                           required
                           className="mt-2 w-full rounded-card border border-brand-ink/10 bg-white px-4 py-3 text-sm text-brand-ink shadow-sm transition-colors duration-200 placeholder:text-brand-ink/35 focus:border-brand-gold/60 focus:outline-none focus:ring-2 focus:ring-brand-gold/40"
                         />
@@ -238,16 +268,16 @@ export default async function AdminPortfolioPage() {
 
                       <div>
                         <label
-                          htmlFor={`eventType-${row.id}`}
+                          htmlFor={`category-${row.id}`}
                           className="text-sm font-medium leading-6 text-brand-ink"
                         >
-                          Тип события
+                          Категория
                         </label>
                         <input
-                          id={`eventType-${row.id}`}
-                          name="eventType"
+                          id={`category-${row.id}`}
+                          name="category"
                           type="text"
-                          defaultValue={row.eventType}
+                          defaultValue={row.category}
                           required
                           className="mt-2 w-full rounded-card border border-brand-ink/10 bg-white px-4 py-3 text-sm text-brand-ink shadow-sm transition-colors duration-200 placeholder:text-brand-ink/35 focus:border-brand-gold/60 focus:outline-none focus:ring-2 focus:ring-brand-gold/40"
                         />
@@ -267,6 +297,39 @@ export default async function AdminPortfolioPage() {
                           min={0}
                           defaultValue={row.sortOrder}
                           required
+                          className="mt-2 w-full rounded-card border border-brand-ink/10 bg-white px-4 py-3 text-sm text-brand-ink shadow-sm transition-colors duration-200 placeholder:text-brand-ink/35 focus:border-brand-gold/60 focus:outline-none focus:ring-2 focus:ring-brand-gold/40"
+                        />
+                      </div>
+
+                      <div className="md:col-span-2">
+                        <label
+                          htmlFor={`captionRu-${row.id}`}
+                          className="text-sm font-medium leading-6 text-brand-ink"
+                        >
+                          Подпись RU
+                        </label>
+                        <input
+                          id={`captionRu-${row.id}`}
+                          name="captionRu"
+                          type="text"
+                          defaultValue={row.captionRu}
+                          required
+                          className="mt-2 w-full rounded-card border border-brand-ink/10 bg-white px-4 py-3 text-sm text-brand-ink shadow-sm transition-colors duration-200 placeholder:text-brand-ink/35 focus:border-brand-gold/60 focus:outline-none focus:ring-2 focus:ring-brand-gold/40"
+                        />
+                      </div>
+
+                      <div className="md:col-span-2">
+                        <label
+                          htmlFor={`captionEn-${row.id}`}
+                          className="text-sm font-medium leading-6 text-brand-ink"
+                        >
+                          Подпись EN
+                        </label>
+                        <input
+                          id={`captionEn-${row.id}`}
+                          name="captionEn"
+                          type="text"
+                          defaultValue=""
                           className="mt-2 w-full rounded-card border border-brand-ink/10 bg-white px-4 py-3 text-sm text-brand-ink shadow-sm transition-colors duration-200 placeholder:text-brand-ink/35 focus:border-brand-gold/60 focus:outline-none focus:ring-2 focus:ring-brand-gold/40"
                         />
                       </div>
@@ -309,44 +372,50 @@ export default async function AdminPortfolioPage() {
 
           <AdminSectionCard
             title="Текущая таблица"
-            description="Таблица помогает быстро проверить итоговый порядок и публичный статус изображений."
+            description="Таблица помогает быстро проверить итоговый порядок и публичный статус элементов портфолио."
           >
             <AdminDataTable
-              caption="Portfolio images"
+              caption="Portfolio items"
               rows={rows}
               rowKey={(row) => row.id}
               emptyState={
                 <AdminEmptyState
                   title="Портфолио пока пустое"
-                  description="Когда в базе появятся изображения, здесь отобразится таблица с типом события, ссылкой, порядком сортировки и статусом активности."
+                  description="Когда в базе появятся элементы, здесь отобразится таблица с категорией, ссылкой, подписью, порядком сортировки и статусом."
                   tone="soft"
                 />
               }
               columns={[
                 {
-                  key: 'eventType',
-                  header: 'Тип события',
+                  key: 'category',
+                  header: 'Категория',
                   render: (row) => (
                     <div className="min-w-[160px]">
-                      <p className="font-medium text-brand-ink">{row.eventType}</p>
+                      <p className="font-medium text-brand-ink">{row.category}</p>
                       <p className="mt-1 text-xs leading-5 text-brand-ink/60">{row.id}</p>
                     </div>
                   ),
                 },
                 {
-                  key: 'url',
+                  key: 'imageUrl',
                   header: 'Изображение',
                   className: 'min-w-[260px]',
                   render: (row) => (
                     <a
-                      href={row.url}
+                      href={row.imageUrl}
                       target="_blank"
                       rel="noreferrer"
                       className="break-all text-sm font-medium text-brand-forest underline decoration-brand-gold/60 underline-offset-4 transition-colors duration-200 hover:text-brand-ink"
                     >
-                      {row.url}
+                      {row.imageUrl}
                     </a>
                   ),
+                },
+                {
+                  key: 'captionRu',
+                  header: 'Подпись',
+                  className: 'min-w-[220px]',
+                  render: (row) => <span>{row.captionRu}</span>,
                 },
                 {
                   key: 'sortOrder',
@@ -377,7 +446,7 @@ export default async function AdminPortfolioPage() {
 
         <AdminHelpCard
           title="Как использовать раздел"
-          description="Сначала добавь базовые изображения по ключевым типам событий, затем отредактируй порядок сортировки и статус. Этого уже достаточно для рабочего MVP-контента."
+          description="Сначала добавьте базовые изображения по ключевым категориям, затем отредактируйте порядок сортировки и статус."
         >
           <div className="rounded-card border border-brand-ink/10 bg-white/70 px-4 py-3 text-sm leading-6 text-brand-ink/75">
             Следующим шагом сюда можно добавить удаление записей и превью изображений без перестройки страницы.
