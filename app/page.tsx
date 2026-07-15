@@ -1,5 +1,5 @@
 // app/page.tsx
-// PRIMA Decor — Public homepage (Next.js App Router, Server Component).
+// Si-Si — Public homepage (Next.js App Router, Server Component).
 //
 // ARCHITECTURE:
 //   This file is a Server Component (no 'use client' directive).
@@ -66,7 +66,7 @@ import { CalculatorSummary }          from '@/components/site/calculator/calcula
 // ---------------------------------------------------------------------------
 
 export const metadata: Metadata = {
-  title: 'PRIMA Decor — Оформление мероприятий в Москве за 24 часа',
+  title: 'Si-Si — Оформление мероприятий в Москве за 24 часа',
   description:
     'Флористическое оформление входных групп, свадеб, корпоративов и любых мероприятий в Москве и МО. ' +
     'Искусственные и живые цветы, воздушные шары, срочные букеты от 15 000 ₽. Под ключ за 24 часа.',
@@ -84,23 +84,23 @@ export const metadata: Metadata = {
   ],
   alternates: {
     // Canonical URL — replace with actual production domain once live.
-    canonical: process.env.NEXT_PUBLIC_SITE_URL ?? 'https://primadecor.ru',
+    canonical: process.env.NEXT_PUBLIC_SITE_URL ?? 'https://si-si.ru',
   },
   openGraph: {
-    title: 'PRIMA Decor — Оформление мероприятий в Москве за 24 часа',
+    title: 'Si-Si — Оформление мероприятий в Москве за 24 часа',
     description:
       'Флористическое оформление входных групп, свадеб, корпоративов в Москве и МО. ' +
       'Под ключ: идея, декор, доставка, монтаж и демонтаж.',
-    url: process.env.NEXT_PUBLIC_SITE_URL ?? 'https://primadecor.ru',
-    siteName: 'PRIMA Decor',
+    url: process.env.NEXT_PUBLIC_SITE_URL ?? 'https://si-si.ru',
+    siteName: 'Si-Si',
     locale: 'ru_RU',
     type: 'website',
     // og:image — uncomment and add final brand photograph when available:
-    // images: [{ url: '/og-cover.jpg', width: 1200, height: 630, alt: 'PRIMA Decor — флористическое оформление' }],
+    // images: [{ url: '/og-cover.jpg', width: 1200, height: 630, alt: 'Si-Si — флористическое оформление' }],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'PRIMA Decor — Оформление мероприятий в Москве за 24 часа',
+    title: 'Si-Si — Оформление мероприятий в Москве за 24 часа',
     description:
       'Флористический декор под ключ: входные группы, свадьбы, корпоративы. Москва и МО. Старт за 24 часа.',
   },
@@ -117,14 +117,14 @@ export const metadata: Metadata = {
 const jsonLdLocalBusiness = {
   '@context': 'https://schema.org',
   '@type': 'LocalBusiness',
-  name: 'PRIMA Decor',
+  name: 'Si-Si',
   description:
     'Флористическое оформление мероприятий, входных групп, свадеб и корпоративов ' +
     'в Москве и Московской области. Под ключ за 24 часа.',
-  url: process.env.NEXT_PUBLIC_SITE_URL ?? 'https://primadecor.ru',
+  url: process.env.NEXT_PUBLIC_SITE_URL ?? 'https://si-si.ru',
   telephone: '+79990000000',   // TODO: replace with real phone before launch
-  email: 'info@primadecor.ru', // TODO: replace with real email before launch
-  image: `${process.env.NEXT_PUBLIC_SITE_URL ?? 'https://primadecor.ru'}/og-cover.jpg`,
+  email: 'info@si-si.ru', // TODO: replace with real email before launch
+  image: `${process.env.NEXT_PUBLIC_SITE_URL ?? 'https://si-si.ru'}/og-cover.jpg`,
   address: {
     '@type': 'PostalAddress',
     addressLocality: 'Москва',

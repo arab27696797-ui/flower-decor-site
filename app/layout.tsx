@@ -1,5 +1,5 @@
 // app/layout.tsx
-// PRIMA Decor — Root layout for Next.js App Router.
+// Si-Si — Root layout for Next.js App Router.
 // Loads Cormorant Garamond (display) + Inter (body) via next/font/google.
 // Both subsets include Cyrillic for Russian primary locale.
 // Font CSS variables --font-cormorant and --font-inter are injected on <html>
@@ -49,14 +49,14 @@ export const metadata: Metadata = {
   // metadataBase is required for absolute OG/Twitter image URLs.
   // Replace with real production domain once deployed.
   metadataBase: new URL(
-    process.env.NEXT_PUBLIC_SITE_URL ?? 'https://primadecor.ru'
+    process.env.NEXT_PUBLIC_SITE_URL ?? 'https://si-si.ru'
   ),
 
-  // Title template: page-specific titles get " — PRIMA Decor" appended.
+  // Title template: page-specific titles get " — Si-Si" appended.
   // The root `default` is used when a page exports no title.
   title: {
-    default: 'PRIMA Decor — Оформление мероприятий в Москве за 24 часа',
-    template: '%s — PRIMA Decor',
+    default: 'Si-Si — Оформление мероприятий в Москве за 24 часа',
+    template: '%s — Si-Si',
   },
 
   description:
@@ -80,9 +80,9 @@ export const metadata: Metadata = {
   // Open Graph defaults
   openGraph: {
     type: 'website',
-    siteName: 'PRIMA Decor',
+    siteName: 'Si-Si',
     locale: 'ru_RU',
-    title: 'PRIMA Decor — Оформление мероприятий в Москве за 24 часа',
+    title: 'Si-Si — Оформление мероприятий в Москве за 24 часа',
     description:
       'Флористическое оформление под ключ: входные группы, свадьбы, корпоративы. ' +
       'Москва и МО. Старт за 24 часа после оплаты.',
@@ -92,7 +92,7 @@ export const metadata: Metadata = {
     //     url: '/og-image.jpg',
     //     width: 1200,
     //     height: 630,
-    //     alt: 'PRIMA Decor — флористическое оформление мероприятий',
+    //     alt: 'Si-Si — флористическое оформление мероприятий',
     //   },
     // ],
   },
@@ -100,7 +100,7 @@ export const metadata: Metadata = {
   // Twitter / X card
   twitter: {
     card: 'summary_large_image',
-    title: 'PRIMA Decor — Оформление мероприятий в Москве за 24 часа',
+    title: 'Si-Si — Оформление мероприятий в Москве за 24 часа',
     description:
       'Флористический декор под ключ: входные группы, свадьбы, корпоративы. ' +
       'Москва и МО.',
