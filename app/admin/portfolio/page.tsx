@@ -1,5 +1,3 @@
-import { revalidatePath } from 'next/cache'
-
 import { AdminDataTable } from '@/components/admin/admin-data-table'
 import { AdminEmptyState } from '@/components/admin/admin-empty-state'
 import { AdminHelpCard } from '@/components/admin/admin-help-card'
@@ -8,6 +6,9 @@ import { AdminSectionCard } from '@/components/admin/admin-section-card'
 import { requireAdminAuth } from '@/lib/admin-auth'
 import { prisma } from '@/lib/prisma'
 
+import { createPortfolioItemAction, updatePortfolioItemAction } from './actions'
+import { PortfolioFormClient } from './portfolio-form-client'
+
 type PortfolioTableRow = {
   id: string
   category: string
@@ -15,87 +16,6 @@ type PortfolioTableRow = {
   captionRu: string
   sortOrder: number
   isActive: boolean
-}
-
-async function createPortfolioItemAction(formData: FormData) {
-  'use server'
-
-  await requireAdminAuth()
-
-  const imageUrl = String(formData.get('imageUrl') ?? '').trim()
-  const category = String(formData.get('category') ?? '').trim()
-  const captionRu = String(formData.get('captionRu') ?? '').trim()
-  const captionEn = String(formData.get('captionEn') ?? '').trim()
-  const sortOrder = Number(formData.get('sortOrder') ?? 0)
-  const isActive = formData.get('isActive') === 'true'
-
-  if (!imageUrl || !category || !captionRu || Number.isNaN(sortOrder)) {
-    return {
-      ok: false as const,
-      error: 'Проверьте ссылку, категорию, подпись и порядок сортировки.',
-    }
-  }
-
-  await prisma.portfolioItem.create({
-    data: {
-      imageUrl,
-      videoUrl: null,
-      category,
-      captionRu,
-      captionEn: captionEn || captionRu,
-      sortOrder,
-      isActive,
-    },
-  })
-
-  revalidatePath('/admin/portfolio')
-  revalidatePath('/')
-
-  return {
-    ok: true as const,
-  }
-}
-
-async function updatePortfolioItemAction(formData: FormData) {
-  'use server'
-
-  await requireAdminAuth()
-
-  const id = String(formData.get('id') ?? '').trim()
-  const imageUrl = String(formData.get('imageUrl') ?? '').trim()
-  const category = String(formData.get('category') ?? '').trim()
-  const captionRu = String(formData.get('captionRu') ?? '').trim()
-  const captionEn = String(formData.get('captionEn') ?? '').trim()
-  const sortOrder = Number(formData.get('sortOrder') ?? 0)
-  const isActive = formData.get('isActive') === 'true'
-
-  if (!id || !imageUrl || !category || !captionRu || Number.isNaN(sortOrder)) {
-    return {
-      ok: false as const,
-      error: 'Не удалось обновить запись. Проверьте поля формы.',
-    }
-  }
-
-  await prisma.portfolioItem.update({
-    where: {
-      id,
-    },
-    data: {
-      imageUrl,
-      category,
-      captionRu,
-      captionEn: captionEn || captionRu,
-      sortOrder,
-      isActive,
-    },
-  })
-
-  revalidatePath('/admin/portfolio')
-  revalidatePath('/')
-
-  return {
-    ok: true as const,
-  }
 }
 
 export default async function AdminPortfolioPage() {
@@ -128,7 +48,10 @@ export default async function AdminPortfolioPage() {
             title="Добавить элемент портфолио"
             description="Новая запись сразу попадёт в административный список. На сайт выводятся только активные элементы."
           >
-            <form action={createPortfolioItemAction} className="grid gap-4 md:grid-cols-2">
+            <PortfolioFormClient
+              action={createPortfolioItemAction}
+              className="grid gap-4 md:grid-cols-2"
+            >
               <div className="md:col-span-2">
                 <label htmlFor="imageUrl" className="text-sm font-medium leading-6 text-brand-ink">
                   Ссылка на изображение
@@ -225,7 +148,7 @@ export default async function AdminPortfolioPage() {
                   После сохранения страница обновится, и новая запись появится в таблице.
                 </p>
               </div>
-            </form>
+            </PortfolioFormClient>
           </AdminSectionCard>
 
           <AdminSectionCard
@@ -241,7 +164,7 @@ export default async function AdminPortfolioPage() {
             ) : (
               <div className="flex flex-col gap-4">
                 {rows.map((row) => (
-                  <form
+                  <PortfolioFormClient
                     key={row.id}
                     action={updatePortfolioItemAction}
                     className="rounded-card border border-brand-ink/10 bg-white/80 p-4 shadow-sm"
@@ -364,7 +287,7 @@ export default async function AdminPortfolioPage() {
                         </button>
                       </div>
                     </div>
-                  </form>
+                  </PortfolioFormClient>
                 ))}
               </div>
             )}
