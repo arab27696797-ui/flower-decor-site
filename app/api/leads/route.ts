@@ -44,28 +44,24 @@ export async function POST(request: Request): Promise<NextResponse> {
   const data: CreateLeadV2Input = parsed.data
 
   // ---- 3. Persist to DB (Prisma) -------------------------------------------
-  // Compatibility mapping note:
-  // The current Prisma Lead model does not yet have a dedicated `location` field.
-  // Until the schema migration is run, `location` is stored in `eventType`
-  // (the nearest semantically acceptable existing field).
-  // `desiredDate` is set to null — removed from v2 flow.
-  // `cartItems` is a Prisma Json column — stores the full EstimateCart or [].
   let leadId: string
 
   try {
     const lead = await prisma.lead.create({
       data: {
-        name:        data.name,
-        phone:       data.phone,
-        eventType:   data.location,           // compatibility: location → eventType
-        desiredDate: null,                    // not collected in v2 flow
-        comment:     data.comment ?? null,
-        cartItems:   data.estimateCart
+        name:          data.name,
+        phone:         data.phone,
+        eventLocation: data.location,
+        eventType:     null,
+        desiredDate:   null,
+        comment:       data.comment ?? null,
+        cartItems:     data.estimateCart
                        ? (data.estimateCart as unknown as Parameters<
                            typeof prisma.lead.create
                          >[0]['data']['cartItems'])
                        : [],
-        deviceType:  data.deviceType,
+        totalEstimate: data.estimateCart?.totalWithMarkup ?? 0,
+        deviceType:    data.deviceType,
       },
     })
 
@@ -81,12 +77,11 @@ export async function POST(request: Request): Promise<NextResponse> {
   // ---- 4. Telegram notification (non-fatal) --------------------------------
   try {
     await sendLeadToTelegram({
-      leadId,
-      name:         data.name,
-      phone:        data.phone,
-      location:     data.location,
-      comment:      data.comment ?? '',
-      estimateCart: data.estimateCart,
+      name:     data.name,
+      phone:    data.phone,
+      location: data.location,
+      comment:  data.comment ?? '',
+      cart:     data.estimateCart ?? null,
     })
   } catch (tgError) {
     // Lead is already persisted — Telegram failure must not break the response.
