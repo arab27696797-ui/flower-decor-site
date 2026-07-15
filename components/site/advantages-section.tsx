@@ -1,7 +1,7 @@
 'use client'
 
 // components/site/advantages-section.tsx
-// PRIMA Decor — Trust / Advantages section.
+// Si-Si — Trust / Advantages section.
 // Communicates key differentiators: speed, full-service, reliability, geography.
 // No fabricated metrics — content is promise-based and factual.
 // Uses useTranslations for all visible text.
@@ -202,8 +202,8 @@ export function AdvantagesSection() {
   const { locale } = useTranslations()
 
   const sectionTitle = locale === 'en'
-    ? 'Why PRIMA Decor'
-    : 'Почему PRIMA Decor'
+    ? 'Why Si-Si'
+    : 'Почему Si-Si'
 
   const sectionSubtitle = locale === 'en'
     ? 'We combine speed, quality, and complete operational responsibility — so your event runs flawlessly.'

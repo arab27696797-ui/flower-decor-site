@@ -1,7 +1,7 @@
 'use client'
 
 // components/site/cookie-banner.tsx
-// PRIMA Decor — Cookie consent banner.
+// Si-Si — Cookie consent banner.
 // Compliant with Russian 152-FZ personal data requirements.
 // Shown on first visit; dismissed on accept.
 // Persistence: localStorage with a graceful in-memory fallback
@@ -17,7 +17,7 @@ import { useTranslations } from '@/lib/i18n'
 // Storage key
 // ---------------------------------------------------------------------------
 
-const STORAGE_KEY = 'prima_cookie_consent_v1'
+const STORAGE_KEY = 'sisi_cookie_consent_v1'
 
 // ---------------------------------------------------------------------------
 // Safe storage helpers — graceful fallback when localStorage is unavailable
@@ -118,7 +118,7 @@ export function CookieBanner() {
         style={{
           // Inline animation fallback for environments where
           // Tailwind animate-slide-up is not configured
-          animation: 'prima-slide-up 0.35s cubic-bezier(0.16, 1, 0.3, 1) both',
+          animation: 'sisi-slide-up 0.35s cubic-bezier(0.16, 1, 0.3, 1) both',
         }}
       >
         {/* ---- Icon ---------------------------------------------------- */}
@@ -180,7 +180,7 @@ export function CookieBanner() {
 
       {/* ---- Keyframe definition — scoped inline to avoid globals dependency */}
       <style>{`
-        @keyframes prima-slide-up {
+        @keyframes sisi-slide-up {
           from {
             opacity: 0;
             transform: translateY(16px);
@@ -191,7 +191,7 @@ export function CookieBanner() {
           }
         }
         @media (prefers-reduced-motion: reduce) {
-          @keyframes prima-slide-up {
+          @keyframes sisi-slide-up {
             from { opacity: 0; }
             to   { opacity: 1; }
           }

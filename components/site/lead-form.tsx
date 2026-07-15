@@ -306,8 +306,8 @@ export function LeadForm({
 
           <p className="text-xs text-brand-ink/50 italic">
             {locale === 'en'
-              ? 'PRIMA Decor — we take care of everything.'
-              : 'PRIMA Decor — все заботы берём на себя.'}
+              ? 'Si-Si — we take care of everything.'
+              : 'Si-Si — все заботы берём на себя.'}
           </p>
         </div>
       </section>
@@ -599,8 +599,8 @@ export function LeadForm({
         {/* ---- Supporting brand note ---- */}
         <p className="text-xs leading-relaxed text-brand-ink/45 text-center">
           {locale === 'en'
-            ? 'PRIMA Decor — full-service decoration, Moscow & MO, within 24 h. Urgent projects on the same day.'
-            : 'PRIMA Decor — оформление под ключ, Москва и МО, за 24 часа. Срочные проекты — в день обращения.'}
+            ? 'Si-Si — full-service decoration, Moscow & MO, within 24 h. Urgent projects on the same day.'
+            : 'Si-Si — оформление под ключ, Москва и МО, за 24 часа. Срочные проекты — в день обращения.'}
         </p>
       </form>
     </section>

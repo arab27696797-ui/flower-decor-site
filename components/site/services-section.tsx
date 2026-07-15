@@ -1,7 +1,7 @@
 'use client'
 
 // components/site/services-section.tsx
-// PRIMA Decor — Services section.
+// Si-Si — Services section.
 // Presents all 5 core service offerings with semantic HTML and responsive layout.
 // Uses useTranslations for all visible text.
 // Includes section-level CTA pointing to the calculator.

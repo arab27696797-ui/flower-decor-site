@@ -1,5 +1,5 @@
 // components/site/hero-section.tsx
-// PRIMA Decor — Premium hero section.
+// Si-Si — Premium hero section.
 //
 // ARCHITECTURE NOTES:
 // - 'use client' is required: uses useTranslations (context) and IntersectionObserver animation.

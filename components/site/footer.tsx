@@ -1,7 +1,7 @@
 'use client'
 
 // components/site/footer.tsx
-// PRIMA Decor — Site footer.
+// Si-Si — Site footer.
 // Brand block + nav links + contact links + legal links + copyright.
 // Contact constants isolated at the top for easy replacement when contacts admin is wired.
 // External links use target="_blank" rel="noopener noreferrer".
@@ -15,15 +15,15 @@ import { useTranslations } from '@/lib/i18n'
 
 const CONTACT_PHONE_DISPLAY   = '+7 (999) 000-00-00'
 const CONTACT_PHONE_TEL       = '+79990000000'
-const CONTACT_TELEGRAM_HANDLE = 'primadecor_msk'
+const CONTACT_TELEGRAM_HANDLE = 'si-si_msk'
 const CONTACT_WHATSAPP_NUMBER = '79990000000'
-const CONTACT_EMAIL           = 'info@primadecor.ru'
+const CONTACT_EMAIL           = 'info@si-si.ru'
 
 // ---------------------------------------------------------------------------
 // Inline SVG logo mark — same as navbar, no external dep
 // ---------------------------------------------------------------------------
 
-function PrimaLogoMark({ className = '' }: { className?: string }) {
+function SiSiLogoMark({ className = '' }: { className?: string }) {
   return (
     <svg
       viewBox="0 0 32 32"
@@ -198,8 +198,8 @@ export function Footer() {
   const legalTitle   = locale === 'en' ? 'Legal'       : 'Документы'
 
   const copyrightLine = locale === 'en'
-    ? `© ${new Date().getFullYear()} PRIMA Decor. All rights reserved.`
-    : `© ${new Date().getFullYear()} PRIMA Decor. Все права защищены.`
+    ? `© ${new Date().getFullYear()} Si-Si. All rights reserved.`
+    : `© ${new Date().getFullYear()} Si-Si. Все права защищены.`
 
   const disclaimer = locale === 'en'
     ? 'The website does not accept payments. All prices shown are approximate estimates only.'
@@ -219,7 +219,7 @@ export function Footer() {
             {/* Logo */}
             <a
               href="/"
-              aria-label="PRIMA Decor — на главную"
+              aria-label="Si-Si — на главную"
               className="
                 flex items-center gap-2.5 w-fit
                 text-white hover:text-brand-gold
@@ -228,9 +228,9 @@ export function Footer() {
                 focus-visible:ring-brand-gold rounded
               "
             >
-              <PrimaLogoMark className="h-8 w-8" />
+              <SiSiLogoMark className="h-8 w-8" />
               <span className="font-display text-base font-semibold tracking-wide">
-                PRIMA Decor
+                Si-Si
               </span>
             </a>
 

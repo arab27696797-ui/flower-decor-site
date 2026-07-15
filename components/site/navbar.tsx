@@ -1,7 +1,7 @@
 'use client'
 
 // components/site/navbar.tsx
-// PRIMA Decor — sticky responsive navbar.
+// Si-Si — sticky responsive navbar.
 // Desktop: logo | nav links | lang switcher | CTA call button.
 // Mobile: logo | lang switcher | hamburger → slide-down menu with nav + CTA.
 // Language switching is wired directly to useTranslations setLocale + toggleLocale.
@@ -39,7 +39,7 @@ const CONTACT_PHONE_TEL     = '+79990000000'
 // Monochrome, works at 24px and 200px, uses currentColor.
 // ---------------------------------------------------------------------------
 
-function PrimaLogoMark({ className = '' }: { className?: string }) {
+function SiSiLogoMark({ className = '' }: { className?: string }) {
   return (
     <svg
       viewBox="0 0 32 32"
@@ -185,7 +185,7 @@ export function Navbar() {
         {/* ---- Logo ---------------------------------------------------- */}
         <a
           href="/"
-          aria-label="PRIMA Decor — на главную"
+          aria-label="Si-Si — на главную"
           className="
             flex items-center gap-2.5 shrink-0
             text-brand-forest hover:text-brand-forest/80
@@ -193,9 +193,9 @@ export function Navbar() {
             focus-visible:ring-2 focus-visible:ring-brand-gold rounded
           "
         >
-          <PrimaLogoMark className="h-8 w-8 text-brand-forest" />
+          <SiSiLogoMark className="h-8 w-8 text-brand-forest" />
           <span className="font-display text-lg font-semibold tracking-tight text-brand-forest leading-none">
-            PRIMA<span className="font-light ml-1 text-brand-gold">Decor</span>
+            Si-<span className="font-light ml-1 text-brand-gold">Si</span>
           </span>
         </a>
 
@@ -261,8 +261,8 @@ export function Navbar() {
             href={`tel:${CONTACT_PHONE_TEL}`}
             aria-label={
               locale === 'en'
-                ? `Call PRIMA Decor: ${CONTACT_PHONE_DISPLAY}`
-                : `Позвонить PRIMA Decor: ${CONTACT_PHONE_DISPLAY}`
+                ? `Call Si-Si: ${CONTACT_PHONE_DISPLAY}`
+                : `Позвонить Si-Si: ${CONTACT_PHONE_DISPLAY}`
             }
             className="
               flex items-center gap-2 rounded-lg
@@ -386,7 +386,7 @@ export function Navbar() {
             onClick={handleNavClick}
             aria-label={
               locale === 'en'
-                ? `Call PRIMA Decor: ${CONTACT_PHONE_DISPLAY}`
+                ? `Call Si-Si: ${CONTACT_PHONE_DISPLAY}`
                 : `Позвонить: ${CONTACT_PHONE_DISPLAY}`
             }
             className="

@@ -1,7 +1,7 @@
 'use client'
 
 // components/site/contacts-section.tsx
-// PRIMA Decor — Contacts section.
+// Si-Si — Contacts section.
 // Phone, Telegram, WhatsApp, service area, response time.
 // All contact constants are isolated at the top for easy admin replacement later.
 // External links use target="_blank" rel="noopener noreferrer" per security rules.
@@ -15,10 +15,10 @@ import { useTranslations } from '@/lib/i18n'
 
 const CONTACT_PHONE_DISPLAY  = '+7 (999) 000-00-00'
 const CONTACT_PHONE_TEL      = '+79990000000'          // tel: href — digits only
-const CONTACT_TELEGRAM_HANDLE = 'primadecor_msk'       // without @
+const CONTACT_TELEGRAM_HANDLE = 'si-si_msk'       // without @
 const CONTACT_WHATSAPP_NUMBER = '79990000000'          // digits only, with country code
-const CONTACT_EMAIL           = 'info@primadecor.ru'   // optional — shown in footer only
-const CONTACT_INSTAGRAM       = 'primadecor.msk'       // Instagram handle
+const CONTACT_EMAIL           = 'info@si-si.ru'   // optional — shown in footer only
+const CONTACT_INSTAGRAM       = 'si-si.msk'       // Instagram handle
 
 // ---------------------------------------------------------------------------
 // Inline SVG icons
