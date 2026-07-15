@@ -55,7 +55,7 @@
   # Start the standalone Next.js server produced by `output: 'standalone'`
   # in next.config.ts. Railway automatically sets PORT and HOSTNAME env vars;
   # the standalone server reads them correctly.
-  startCommand  = "node .next/standalone/server.js"
+  startCommand  = "HOSTNAME=0.0.0.0 node .next/standalone/server.js"
 
   # Number of instances. Keep at 1 for first deploy to avoid shared in-memory
   # state issues (admin contact/pricing stores are still in-memory until the
