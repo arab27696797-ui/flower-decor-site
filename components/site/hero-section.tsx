@@ -39,7 +39,7 @@ const PREVIEW_BASE_PRICE = 15_000
 // ---------------------------------------------------------------------------
 interface TrustBadge {
   icon: string
-  labelKey: keyof ReturnType<typeof useTranslations>['hero']['trust']
+  labelKey: keyof ReturnType<typeof useTranslations>['t']['hero']['trust']
 }
 
 // ---------------------------------------------------------------------------
@@ -47,7 +47,7 @@ interface TrustBadge {
 // ---------------------------------------------------------------------------
 
 export function HeroSection() {
-  const t = useTranslations()
+  const { t } = useTranslations()
   const sectionRef = useRef<HTMLElement>(null)
   const contentRef = useRef<HTMLDivElement>(null)
   const cardRef    = useRef<HTMLDivElement>(null)
