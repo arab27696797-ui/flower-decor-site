@@ -72,7 +72,7 @@ export const en = {
     badge:       'Available 24/7 · On-site within 24 hours of payment',
 
     // New keys — required by components/site/hero-section.tsx
-    ariaLabel: 'Hero — PRIMA Decor, premium floral decoration in Moscow',
+    ariaLabel: 'Hero — Si-Si, premium floral decoration in Moscow',
     eyebrow:   'Premium event decoration · Moscow',
 
     heading: {
@@ -107,7 +107,7 @@ export const en = {
         'materials, delivery, and urgency.',
     },
 
-    imageAlt:   'Wedding floral decoration — fresh flowers, arches and hall styling by PRIMA Decor',
+    imageAlt:   'Wedding floral decoration — fresh flowers, arches and hall styling by Si-Si',
     photoLabel: 'From our portfolio',
   },
 
@@ -299,7 +299,7 @@ export const en = {
     privacyPolicy: 'Privacy Policy',
     personalData:  'Personal Data Processing',
     cookiePolicy:  'Cookie Policy',
-    rights:        '© 2024 PRIMA Decor. All rights reserved.',
+    rights:        '© 2024 Si-Si. All rights reserved.',
     sections: {
       services: 'Services',
       company:  'Company',
@@ -314,7 +314,7 @@ export const en = {
     pageTitle:   'Privacy Policy',
     lastUpdated: 'Last updated',
     intro:
-      'This policy describes how PRIMA Decor collects, uses, and protects ' +
+      'This policy describes how Si-Si collects, uses, and protects ' +
       'your personal data in accordance with applicable data protection law.',
   },
 
