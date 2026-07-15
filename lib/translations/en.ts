@@ -342,4 +342,4 @@ export const en = {
     navPortfolio:        'Portfolio',
   },
 
-} as const
+}

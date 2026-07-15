@@ -301,6 +301,8 @@ const ru = {
     navPortfolio:        'Портфолио',
   },
 
-} as const
+}
+
+export type Translations = typeof ru
 
 export default ru
