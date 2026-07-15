@@ -1,5 +1,5 @@
 // app/api/admin/contacts/route.ts
-// PRIMA Decor — Admin API: Public Contact Information.
+// Si-Si — Admin API: Public Contact Information.
 //
 // METHODS SUPPORTED:
 //   GET   — returns the current in-memory contact configuration.
@@ -31,7 +31,7 @@ import { NextRequest, NextResponse } from 'next/server'
 export type ContactsConfig = {
   phoneDisplay: string      // Human-readable display: "+7 (999) 123-45-67"
   phoneTel: string          // tel: href value: "+79991234567"
-  telegramHandle: string    // without @: "prima_decor"
+  telegramHandle: string    // without @: "si-si"
   whatsappNumber: string    // wa.me/ path, digits only: "79991234567"
   email: string             // optional, may be empty string
   instagramHandle: string   // without @, optional
@@ -45,10 +45,10 @@ export type ContactsConfig = {
 const DEFAULT_CONTACTS: ContactsConfig = {
   phoneDisplay: '+7 (999) 123-45-67',
   phoneTel: '+79991234567',
-  telegramHandle: 'prima_decor',
+  telegramHandle: 'si-si',
   whatsappNumber: '79991234567',
-  email: 'info@prima-decor.ru',
-  instagramHandle: 'prima.decor',
+  email: 'info@si-si.ru',
+  instagramHandle: 'si-si.decor',
 }
 
 // ---------------------------------------------------------------------------
