@@ -103,6 +103,7 @@ export const estimateCartSchema = z.object({
   items:             z.array(cartItemV2Schema),
   totalBeforeMarkup: z.number().nonnegative(),
   totalWithMarkup:   z.number().nonnegative(),
+  markupCoefficient: z.number().positive().default(1.3),
 })
 
 /**

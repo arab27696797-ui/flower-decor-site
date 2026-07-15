@@ -1,10 +1,10 @@
 import { prisma } from '@/lib/prisma'
 
-export async function getActivePortfolioImages(eventType?: string) {
-  return prisma.portfolioImage.findMany({
+export async function getActivePortfolioItems(category?: string) {
+  return prisma.portfolioItem.findMany({
     where: {
       isActive: true,
-      ...(eventType ? { eventType } : {}),
+      ...(category ? { category } : {}),
     },
     orderBy: [
       { sortOrder: 'asc' },
@@ -13,33 +13,17 @@ export async function getActivePortfolioImages(eventType?: string) {
   })
 }
 
-export async function getActiveSubscriptionTiers() {
-  return prisma.subscriptionTier.findMany({
-    where: {
-      isActive: true,
-    },
-    orderBy: {
-      costPerVisit: 'asc',
-    },
-  })
+export type SubscriptionTierRow = {
+  id: string
+  tierId: string
+  visitsPerMonth: number
+  costPerVisit: number
+  markupPercent: number
+  zoneDescription: string
 }
 
-export async function getActivePricingRules(filters?: {
-  calcType?: string
-  category?: string
-}) {
-  return prisma.pricingRule.findMany({
-    where: {
-      isActive: true,
-      ...(filters?.calcType ? { calcType: filters.calcType } : {}),
-      ...(filters?.category ? { category: filters.category } : {}),
-    },
-    orderBy: [
-      { category: 'asc' },
-      { marketLo: 'asc' },
-      { label: 'asc' },
-    ],
-  })
+export async function getActiveSubscriptionTiers(): Promise<SubscriptionTierRow[]> {
+  return []
 }
 
 export async function getRecentLeads(limit = 50) {
