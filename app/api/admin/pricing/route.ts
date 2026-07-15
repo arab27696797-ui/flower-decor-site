@@ -26,9 +26,8 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 import {
-  DEFAULT_PRICING,
+  DEFAULT_ADMIN_PRICING,
   type PricingConfig,
-  type CategoryPricing,
 } from '@/lib/calculator-config'
 
 // ---------------------------------------------------------------------------
@@ -38,7 +37,7 @@ import {
 // ---------------------------------------------------------------------------
 
 // Deep-clone defaults so mutations never corrupt the imported constant.
-let runtimePricing: PricingConfig = structuredClone(DEFAULT_PRICING)
+let runtimePricing: PricingConfig = structuredClone(DEFAULT_ADMIN_PRICING)
 
 /**
  * Read the current pricing configuration.
