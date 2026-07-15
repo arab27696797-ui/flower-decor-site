@@ -3,7 +3,7 @@
 // Always formats messages in Russian — intended for internal staff use.
 // Framework-agnostic: safe to call from app/api/leads/route.ts or any server context.
 
-import type { CartItem, EstimateCart, CategoryId } from './calculator-config'
+import type { CartItem, EstimateCart } from './calculator-config'
 
 // ---------------------------------------------------------------------------
 // Environment variable access
@@ -66,7 +66,7 @@ export type TelegramSendResult =
 // Category label map — Russian display names for staff messages
 // ---------------------------------------------------------------------------
 
-const CATEGORY_LABELS_RU: Record<CategoryId, string> = {
+const CATEGORY_LABELS_RU: Record<string, string> = {
   floral:   'Цветочное оформление',
   balloons: 'Воздушные шары',
   bouquet:  'Срочный букет',
