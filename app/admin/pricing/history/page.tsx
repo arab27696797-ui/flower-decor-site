@@ -74,11 +74,6 @@ export default async function AdminPricingHistoryPage() {
             }
             columns={[
               {
-                key: 'ruleId',
-                header: 'Правило',
-                render: (item) => <span>{item.ruleId}</span>,
-              },
-              {
                 key: 'changedBy',
                 header: 'Кто изменил',
                 render: (item) => <span>{item.changedBy ?? 'Не указано'}</span>,
