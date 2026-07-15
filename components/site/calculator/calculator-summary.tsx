@@ -297,13 +297,13 @@ export function CalculatorSummary({
       </div>
 
       {/* ------------------------------------------------------------------ */}
-      {/* Brand trust note — PRIMA Decor offer context                        */}
+      {/* Brand trust note — Si-Si offer context                        */}
       {/* ------------------------------------------------------------------ */}
       <div className="px-6 py-3 mx-4 mb-4 rounded-lg bg-brand-forest/5 border border-brand-forest/10">
         <p className="text-xs text-brand-forest/75 leading-relaxed font-medium">
           {locale === 'en'
-            ? 'PRIMA Decor — full-service event decoration in Moscow & MO within 24 hours. Concept, materials, delivery, installation and removal — we handle everything.'
-            : 'PRIMA Decor — оформление входных групп и мероприятий в Москве и МО за 24 часа. Идея, материалы, доставка, монтаж и демонтаж — всё берём на себя.'}
+            ? 'Si-Si — full-service event decoration in Moscow & MO within 24 hours. Concept, materials, delivery, installation and removal — we handle everything.'
+            : 'Si-Si — оформление входных групп и мероприятий в Москве и МО за 24 часа. Идея, материалы, доставка, монтаж и демонтаж — всё берём на себя.'}
         </p>
       </div>
 
