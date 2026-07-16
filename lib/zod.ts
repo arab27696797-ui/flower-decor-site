@@ -89,9 +89,14 @@ export const cartItemV2Schema = z.object({
   id:                 z.string().min(1),
   categoryId:         z.string().min(1),
   categoryLabelRu:    z.string(),
-  categoryLabelEn:    z.string(),
+  // Optional in lib/calculator-config.ts CartItem — buildCartItem() in
+  // calculator-cart.ts does not set it, so the key may be absent at runtime.
+  // Strict z.string() here caused VALIDATION_ERROR (400) for every lead
+  // submitted with a calculator estimate attached.
+  categoryLabelEn:    z.string().optional().default(''),
   selections:         z.array(categorySelectionSchema),
-  basePrice:          z.number().nonnegative(),
+  // Optional in CartItem — the store keeps subtotalBeforeMarkup instead.
+  basePrice:          z.number().nonnegative().optional().default(0),
   subtotalWithMarkup: z.number().nonnegative(),
 })
 
