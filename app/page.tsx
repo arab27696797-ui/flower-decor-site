@@ -11,11 +11,12 @@
 //   2. HeroSection     — primary H1, value proposition, dual CTA, trust badges
 //   3. ServicesSection — what we offer, anchor: #services
 //   4. AdvantagesSection — why us, social proof, differentiators, anchor: #advantages
-//   5. Calculator      — price estimator, anchor: #calculator (hero CTA target)
-//   6. LeadForm        — lead capture, anchor: #contact (calculator summary CTA target)
-//   7. ContactsSection — phone, Telegram, WhatsApp, service area, anchor: #contacts
-//   8. Footer          — legal links, secondary nav, social
-//   9. CookieBanner    — cookie consent (fixed/sticky, outside page flow)
+//   5. PortfolioPreview — completed works gallery (/api/portfolio), anchor: #portfolio
+//   6. Calculator      — price estimator, anchor: #calculator (hero CTA target)
+//   7. LeadForm        — lead capture, anchor: #contact (calculator summary CTA target)
+//   8. ContactsSection — phone, Telegram, WhatsApp, service area, anchor: #contacts
+//   9. Footer          — legal links, secondary nav, social
+//  10. CookieBanner    — cookie consent (fixed/sticky, outside page flow)
 //
 // SEO:
 //   - Metadata export below covers title, description, OG, Twitter card.
@@ -45,7 +46,8 @@ import { Navbar }            from '@/components/site/navbar'
 import { HeroSection }       from '@/components/site/hero-section'
 import { ServicesSection }   from '@/components/site/services-section'
 import { AdvantagesSection } from '@/components/site/advantages-section'
-import { LeadForm }          from '@/components/site/lead-form'
+import { PortfolioPreview }  from '@/components/site/portfolio-preview'
+import { LeadFormWithCart }  from '@/components/site/lead-form-with-cart'
 import { ContactsSection }   from '@/components/site/contacts-section'
 import { Footer }            from '@/components/site/footer'
 import { CookieBanner }      from '@/components/site/cookie-banner'
@@ -253,6 +255,12 @@ export default function HomePage() {
           <AdvantagesSection />
         </section>
 
+        {/* 3.5 Portfolio — completed works gallery, fed from /api/portfolio
+                Anchor: #portfolio */}
+        <section id="portfolio" aria-label="Портфолио" className="scroll-mt-20">
+          <PortfolioPreview />
+        </section>
+
         {/* 4. Calculator — price estimator (multi-category accumulative cart)
                Anchor: #calculator — this is the target of the hero primary CTA
                The calculator is composed of four category input components
@@ -313,14 +321,16 @@ export default function HomePage() {
         </section>
 
         {/* 5. Lead form — contact capture
-               Anchor: #contact — target of the calculator summary CTA
-               The form receives pre-filled calculator data from the Zustand store. */}
+               Anchor: #contact — target of the calculator summary CTA.
+               LeadFormWithCart is a client bridge: it reads the calculator
+               Zustand store and passes the live EstimateCart into LeadForm,
+               so the assembled estimate is attached to the submission. */}
         <section
           id="contact"
           aria-labelledby="lead-form-heading"
           className="scroll-mt-20"
         >
-          <LeadForm />
+          <LeadFormWithCart />
         </section>
 
         {/* 6. Contacts — phone, Telegram, WhatsApp, service area
