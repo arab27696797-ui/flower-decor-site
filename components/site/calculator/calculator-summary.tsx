@@ -187,11 +187,30 @@ export function CalculatorSummary({
   const fmt = (n: number) => n.toLocaleString('ru-RU') + ' ₽'
 
   // ---------------------------------------------------------------------------
-  // Handle submit — snapshot the cart and pass to parent
+  // Handle submit — snapshot the cart and pass to parent.
+  // Fallback: when no onSubmitRequest handler is provided (current homepage
+  // usage, where app/page.tsx is a Server Component and cannot pass function
+  // props), scroll to the lead form section. The cart itself is already
+  // shared with the form via the Zustand store through LeadFormWithCart,
+  // so the estimate arrives pre-attached there.
   // ---------------------------------------------------------------------------
   const handleSubmit = () => {
-    if (!onSubmitRequest) return
-    onSubmitRequest(getEstimateCart())
+    if (onSubmitRequest) {
+      onSubmitRequest(getEstimateCart())
+      return
+    }
+
+    const target = document.getElementById('contact')
+    if (!target) return
+
+    const reduceMotion =
+      typeof window !== 'undefined' &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
+    target.scrollIntoView({
+      behavior: reduceMotion ? 'auto' : 'smooth',
+      block: 'start',
+    })
   }
 
   // ---------------------------------------------------------------------------
@@ -308,32 +327,31 @@ export function CalculatorSummary({
       </div>
 
       {/* ------------------------------------------------------------------ */}
-      {/* CTA                                                                  */}
+      {/* CTA — always rendered. Without an onSubmitRequest prop it scrolls  */}
+      {/* to the lead form; the cart reaches the form via the shared store.   */}
       {/* ------------------------------------------------------------------ */}
-      {onSubmitRequest && (
-        <div className="px-6 pb-6">
-          <button
-            type="button"
-            onClick={handleSubmit}
-            className="
-              w-full rounded-lg bg-brand-forest px-5 py-3.5
-              text-sm font-semibold text-white text-center
-              hover:bg-brand-forest/90 active:bg-brand-forest/80
-              transition-colors focus-visible:outline-none
-              focus-visible:ring-2 focus-visible:ring-brand-gold
-            "
-          >
-            {locale === 'en'
-              ? 'Submit request →'
-              : 'Отправить заявку →'}
-          </button>
-          <p className="mt-2 text-center text-xs text-brand-ink/40">
-            {locale === 'en'
-              ? 'No payment required — we will contact you to confirm'
-              : 'Оплата не требуется — мы свяжемся для подтверждения'}
-          </p>
-        </div>
-      )}
+      <div className="px-6 pb-6">
+        <button
+          type="button"
+          onClick={handleSubmit}
+          className="
+            w-full rounded-lg bg-brand-forest px-5 py-3.5
+            text-sm font-semibold text-white text-center
+            hover:bg-brand-forest/90 active:bg-brand-forest/80
+            transition-colors focus-visible:outline-none
+            focus-visible:ring-2 focus-visible:ring-brand-gold
+          "
+        >
+          {locale === 'en'
+            ? 'Submit request →'
+            : 'Отправить заявку →'}
+        </button>
+        <p className="mt-2 text-center text-xs text-brand-ink/40">
+          {locale === 'en'
+            ? 'No payment required — we will contact you to confirm'
+            : 'Оплата не требуется — мы свяжемся для подтверждения'}
+        </p>
+      </div>
     </div>
   )
 }
