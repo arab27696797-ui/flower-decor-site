@@ -14,19 +14,19 @@ export function HeroSection() {
     ? {
         initial: { opacity: 0 },
         whileInView: { opacity: 1 },
-        transition: { duration: 0.45, ease: 'easeOut' },
+        transition: { duration: 0.45, ease: 'easeOut' as const },
       }
     : {
         initial: { opacity: 0, y: 24 },
         whileInView: { opacity: 1, y: 0 },
-        transition: { duration: 0.7, ease: 'easeOut' },
+        transition: { duration: 0.7, ease: 'easeOut' as const },
       }
 
   const hoverLift = reduceMotion
     ? {}
     : {
         whileHover: { y: -4 },
-        transition: { duration: 0.2, ease: 'easeOut' },
+        transition: { duration: 0.2, ease: 'easeOut' as const },
       }
 
   return (
@@ -141,8 +141,8 @@ export function HeroSection() {
           viewport={{ once: true, amount: 0.2 }}
           transition={
             reduceMotion
-              ? { duration: 0.45, ease: 'easeOut', delay: 0.05 }
-              : { duration: 0.8, ease: 'easeOut', delay: 0.1 }
+              ? { duration: 0.45, ease: 'easeOut' as const, delay: 0.05 }
+              : { duration: 0.8, ease: 'easeOut' as const, delay: 0.1 }
           }
           className="relative"
         >
