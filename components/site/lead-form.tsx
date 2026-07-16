@@ -59,7 +59,7 @@ function EstimateMiniSummary({ cart, locale }: EstimateMiniSummaryProps) {
             key={item.id}
             className="flex items-start justify-between gap-4 text-sm text-brand-stone"
           >
-            <span>{locale === 'en' ? item.categoryLabelEn : item.categoryLabelRu}</span>
+            <span>{locale === 'en' ? (item.categoryLabelEn ?? item.categoryLabelRu) : item.categoryLabelRu}</span>
             <span className="shrink-0 font-medium text-brand-parchment tabular-nums">
               {fmt(item.subtotalWithMarkup)}
             </span>
@@ -165,19 +165,19 @@ export function LeadForm({
     ? {
         initial: { opacity: 0 },
         whileInView: { opacity: 1 },
-        transition: { duration: 0.4, ease: 'easeOut' },
+        transition: { duration: 0.4, ease: 'easeOut' as const },
       }
     : {
         initial: { opacity: 0, y: 24 },
         whileInView: { opacity: 1, y: 0 },
-        transition: { duration: 0.75, ease: 'easeOut' },
+        transition: { duration: 0.75, ease: 'easeOut' as const },
       }
 
   const cardHover = reduceMotion
     ? {}
     : {
         whileHover: { y: -4 },
-        transition: { duration: 0.2, ease: 'easeOut' },
+        transition: { duration: 0.2, ease: 'easeOut' as const },
       }
 
   const onSubmit = async (values: LeadFormValues) => {
