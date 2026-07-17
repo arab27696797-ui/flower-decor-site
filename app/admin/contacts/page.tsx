@@ -1,16 +1,6 @@
 // app/admin/contacts/page.tsx
 // Si-Si — Admin: Public Contact Information Editor.
 //
-// ARCHITECTURE STATUS:
-// No contacts persistence API exists yet in this project.
-// This page provides a complete, production-ready UI for editing contact data
-// and is wired to POST /api/admin/contacts — which does NOT exist yet.
-// Until that API is created, save attempts will return a 404 and the UI
-// will surface an honest error message explaining this to staff.
-//
-// The form state, validation, field structure, and UX are fully implemented
-// so that adding the API route in the next step requires zero UI changes.
-//
 // Staff-facing copy is in Russian. Code identifiers and comments are in English.
 
 'use client'
@@ -22,28 +12,27 @@ import React, { useState } from 'react'
 // ---------------------------------------------------------------------------
 
 type ContactsConfig = {
-  phoneDisplay: string      // Human-readable display: "+7 (999) 123-45-67"
-  phoneTel: string          // tel: href value: "+79991234567"
-  telegramHandle: string    // without @: "si-si"
-  whatsappNumber: string    // international digits only: "79991234567"
+  phoneDisplay: string      // Human-readable display: "+7 (495) 792-18-98"
+  phoneTel: string          // tel: href value: "+74957921898"
+  telegramHandle: string    // without @: "SI_SI_Dekor"
+  whatsappNumber: string    // international digits only: "79037921898"
   email: string
-  instagramHandle: string   // without @: "si-si.decor"
+  instagramHandle: string   // without @: "si_si_dekor"
 }
 
 type SaveState = 'idle' | 'saving' | 'saved' | 'error'
 
 // ---------------------------------------------------------------------------
-// Default values — match the constants currently used in site components.
-// When the API is connected, these will be replaced by the fetched values.
+// Default values — real business contacts
 // ---------------------------------------------------------------------------
 
 const DEFAULT_CONTACTS: ContactsConfig = {
-  phoneDisplay: '+7 (999) 123-45-67',
-  phoneTel: '+79991234567',
-  telegramHandle: 'si-si',
-  whatsappNumber: '79991234567',
-  email: 'info@si-si.ru',
-  instagramHandle: 'si-si.decor',
+  phoneDisplay: '+7 (495) 792-18-98',
+  phoneTel: '+74957921898',
+  telegramHandle: 'SI_SI_Dekor',
+  whatsappNumber: '79037921898',
+  email: 'sisidekor860@xmail.ru',
+  instagramHandle: 'si_si_dekor',
 }
 
 // ---------------------------------------------------------------------------
@@ -282,8 +271,6 @@ export default function AdminContactsPage() {
     setSaveError(null)
 
     try {
-      // POST /api/admin/contacts — this route does not exist yet.
-      // When it is created, no changes to this file will be required.
       const res = await fetch('/api/admin/contacts', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -291,7 +278,6 @@ export default function AdminContactsPage() {
       })
 
       if (res.status === 404) {
-        // API not yet created — surface an honest, staff-friendly message.
         throw new Error(
           'API для сохранения контактов ещё не создан. ' +
           'Обратитесь к разработчику для подключения хранилища.'
@@ -364,17 +350,6 @@ export default function AdminContactsPage() {
         </div>
       </div>
 
-      {/* ---- Architecture notice ---- */}
-      <Alert type="warning">
-        <strong>Статус интеграции:</strong> Форма полностью готова, но API для
-        постоянного сохранения контактов ({' '}
-        <code className="rounded bg-amber-100 px-1 text-xs font-mono">
-          /api/admin/contacts
-        </code>
-        {' '}) ещё не создан. После нажатия «Сохранить» вы увидите сообщение об ошибке —
-        это ожидаемо. Следующий шаг разработки: создать этот API-маршрут.
-      </Alert>
-
       {/* ---- Save error ---- */}
       {saveState === 'error' && saveError && (
         <Alert type="error">
@@ -403,12 +378,12 @@ export default function AdminContactsPage() {
         <div className="px-5 pb-4 pt-2 text-sm text-brand-ink/70 leading-relaxed space-y-2">
           <p>
             <strong>Телефон (отображение):</strong> номер в удобном для чтения формате,
-            например <code className="rounded bg-brand-cream px-1 font-mono text-xs">+7 (999) 123-45-67</code>.
+            например <code className="rounded bg-brand-cream px-1 font-mono text-xs">+7 (495) 792-18-98</code>.
             Он показывается клиентам на сайте.
           </p>
           <p>
             <strong>Телефон (ссылка tel:):</strong> тот же номер без пробелов и скобок,
-            только + и цифры: <code className="rounded bg-brand-cream px-1 font-mono text-xs">+79991234567</code>.
+            только + и цифры: <code className="rounded bg-brand-cream px-1 font-mono text-xs">+74957921898</code>.
             Используется для кнопки «Позвонить» на мобильных устройствах.
           </p>
           <p>
@@ -416,7 +391,7 @@ export default function AdminContactsPage() {
           </p>
           <p>
             <strong>WhatsApp:</strong> только цифры без + и пробелов, начиная с кода страны.
-            Пример: <code className="rounded bg-brand-cream px-1 font-mono text-xs">79991234567</code>.
+            Пример: <code className="rounded bg-brand-cream px-1 font-mono text-xs">79037921898</code>.
           </p>
         </div>
       </details>
@@ -434,7 +409,7 @@ export default function AdminContactsPage() {
           value={data.phoneDisplay}
           onChange={(v) => setField('phoneDisplay', v)}
           type="tel"
-          placeholder="+7 (999) 123-45-67"
+          placeholder="+7 (495) 792-18-98"
           description="Показывается клиентам в шапке, контактах и футере"
           error={errors.phoneDisplay}
           autoComplete="tel"
@@ -445,7 +420,7 @@ export default function AdminContactsPage() {
           value={data.phoneTel}
           onChange={(v) => setField('phoneTel', v)}
           type="tel"
-          placeholder="+79991234567"
+          placeholder="+74957921898"
           description="Только + и цифры. Используется в href='tel:...'"
           error={errors.phoneTel}
           autoComplete="tel"
@@ -465,8 +440,8 @@ export default function AdminContactsPage() {
           value={data.telegramHandle}
           onChange={(v) => setField('telegramHandle', v)}
           prefix="@"
-          placeholder="si-si"
-          description="Без символа @. Ссылка: t.me/si-si"
+          placeholder="SI_SI_Dekor"
+          description="Без символа @. Ссылка: t.me/SI_SI_Dekor"
           error={errors.telegramHandle}
         />
         <ContactField
@@ -475,7 +450,7 @@ export default function AdminContactsPage() {
           value={data.whatsappNumber}
           onChange={(v) => setField('whatsappNumber', v)}
           prefix="wa.me/"
-          placeholder="79991234567"
+          placeholder="79037921898"
           description="Только цифры, без +. Начинайте с кода страны."
           error={errors.whatsappNumber}
         />
@@ -494,7 +469,7 @@ export default function AdminContactsPage() {
           value={data.email}
           onChange={(v) => setField('email', v)}
           type="email"
-          placeholder="info@si-si.ru"
+          placeholder="sisidekor860@xmail.ru"
           description="Деловая почта для клиентов (необязательно)"
           error={errors.email}
           autoComplete="email"
@@ -505,7 +480,7 @@ export default function AdminContactsPage() {
           value={data.instagramHandle}
           onChange={(v) => setField('instagramHandle', v)}
           prefix="@"
-          placeholder="si-si.decor"
+          placeholder="si_si_dekor"
           description="Без символа @. Необязательно."
           error={errors.instagramHandle}
         />

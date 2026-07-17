@@ -38,17 +38,16 @@ export type ContactsConfig = {
 }
 
 // ---------------------------------------------------------------------------
-// Default contact configuration
-// Update these values to match the real business contacts before first deploy.
+// Default contact configuration — real business contacts
 // ---------------------------------------------------------------------------
 
 const DEFAULT_CONTACTS: ContactsConfig = {
-  phoneDisplay: '+7 (999) 123-45-67',
-  phoneTel: '+79991234567',
-  telegramHandle: 'si-si',
-  whatsappNumber: '79991234567',
-  email: 'info@si-si.ru',
-  instagramHandle: 'si-si.decor',
+  phoneDisplay: '+7 (495) 792-18-98',
+  phoneTel: '+74957921898',
+  telegramHandle: 'SI_SI_Dekor',
+  whatsappNumber: '79037921898',
+  email: 'sisidekor860@xmail.ru',
+  instagramHandle: 'si_si_dekor',
 }
 
 // ---------------------------------------------------------------------------
@@ -218,7 +217,7 @@ export async function PATCH(request: NextRequest): Promise<NextResponse> {
     body = await request.json()
   } catch {
     return NextResponse.json(
-      { success: false, error: 'Invalid JSON in request body.' },
+      { success: false, error: 'Request body must be a JSON object.' },
       { status: 400 }
     )
   }
