@@ -31,7 +31,7 @@ const DEFAULT_CONTACTS: ContactsConfig = {
   phoneTel: '+74957921898',
   telegramHandle: 'SI_SI_Dekor',
   whatsappNumber: '79037921898',
-  email: 'sisidekor860@xmail.ru',
+  email: 'sisidekor860@mail.ru',
   instagramHandle: 'si_si_dekor',
 }
 
@@ -469,7 +469,7 @@ export default function AdminContactsPage() {
           value={data.email}
           onChange={(v) => setField('email', v)}
           type="email"
-          placeholder="sisidekor860@xmail.ru"
+          placeholder="sisidekor860@mail.ru"
           description="Деловая почта для клиентов (необязательно)"
           error={errors.email}
           autoComplete="email"

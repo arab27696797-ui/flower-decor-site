@@ -29,10 +29,10 @@ import { NextRequest, NextResponse } from 'next/server'
 // ---------------------------------------------------------------------------
 
 export type ContactsConfig = {
-  phoneDisplay: string      // Human-readable display: "+7 (999) 123-45-67"
-  phoneTel: string          // tel: href value: "+79991234567"
-  telegramHandle: string    // without @: "si-si"
-  whatsappNumber: string    // wa.me/ path, digits only: "79991234567"
+  phoneDisplay: string      // Human-readable display: "+7 (495) 792-18-98"
+  phoneTel: string          // tel: href value: "+74957921898"
+  telegramHandle: string    // without @: "SI_SI_Dekor"
+  whatsappNumber: string    // wa.me/ path, digits only: "79037921898"
   email: string             // optional, may be empty string
   instagramHandle: string   // without @, optional
 }
@@ -46,7 +46,7 @@ const DEFAULT_CONTACTS: ContactsConfig = {
   phoneTel: '+74957921898',
   telegramHandle: 'SI_SI_Dekor',
   whatsappNumber: '79037921898',
-  email: 'sisidekor860@xmail.ru',
+  email: 'sisidekor860@mail.ru',
   instagramHandle: 'si_si_dekor',
 }
 
