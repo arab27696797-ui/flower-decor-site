@@ -55,8 +55,8 @@ export default function PrivacyPolicyPage() {
           <div className="flex flex-col gap-0.5 sm:flex-row sm:gap-2">
             <dt className="shrink-0 text-brand-stone">E-mail:</dt>
             <dd className="font-medium">
-              <a href="mailto:sisidekor860@xmail.ru" className="text-brand-gold transition-colors hover:text-brand-gold-light">
-                sisidekor860@xmail.ru
+              <a href="mailto:sisidekor860@mail.ru" className="text-brand-gold transition-colors hover:text-brand-gold-light">
+                sisidekor860@mail.ru
               </a>
             </dd>
           </div>
@@ -125,8 +125,8 @@ export default function PrivacyPolicyPage() {
               +7 (495) 792-18-98
             </a>{' '}
             или по адресу{' '}
-            <a href="mailto:sisidekor860@xmail.ru" className="text-brand-gold transition-colors hover:text-brand-gold-light">
-              sisidekor860@xmail.ru
+            <a href="mailto:sisidekor860@mail.ru" className="text-brand-gold transition-colors hover:text-brand-gold-light">
+              sisidekor860@mail.ru
             </a>
             .
           </p>

@@ -18,7 +18,7 @@ const CONTACT_PHONE2_DISPLAY  = '+7 (903) 792-18-98'
 const CONTACT_PHONE2_TEL      = '+79037921898'
 const CONTACT_TELEGRAM_HANDLE = 'SI_SI_Dekor'
 const CONTACT_WHATSAPP_NUMBER = '79037921898'
-const CONTACT_EMAIL           = 'sisidekor860@xmail.ru'
+const CONTACT_EMAIL           = 'sisidekor860@mail.ru'
 const CONTACT_INSTAGRAM       = 'si_si_dekor'
 
 // ---------------------------------------------------------------------------

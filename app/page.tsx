@@ -104,7 +104,7 @@ const jsonLdLocalBusiness = {
     'в Москве и Московской области. Под ключ за 24 часа.',
   url: process.env.NEXT_PUBLIC_SITE_URL ?? 'https://si-si.ru',
   telephone: '+74957921898',
-  email: 'sisidekor860@xmail.ru',
+  email: 'sisidekor860@mail.ru',
   image: `${process.env.NEXT_PUBLIC_SITE_URL ?? 'https://si-si.ru'}/og-cover.jpg`,
   address: {
     '@type': 'PostalAddress',
