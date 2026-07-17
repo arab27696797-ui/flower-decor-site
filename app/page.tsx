@@ -103,11 +103,13 @@ const jsonLdLocalBusiness = {
     'Флористическое оформление мероприятий, входных групп, свадеб и корпоративов ' +
     'в Москве и Московской области. Под ключ за 24 часа.',
   url: process.env.NEXT_PUBLIC_SITE_URL ?? 'https://si-si.ru',
-  telephone: '+79990000000',   // TODO: replace with real phone before launch
-  email: 'info@si-si.ru',      // TODO: replace with real email before launch
+  telephone: '+74957921898',
+  email: 'sisidekor860@xmail.ru',
   image: `${process.env.NEXT_PUBLIC_SITE_URL ?? 'https://si-si.ru'}/og-cover.jpg`,
   address: {
     '@type': 'PostalAddress',
+    streetAddress: 'Каширское ш., д. 48, к. 2, помещение 2П',
+    postalCode: '115409',
     addressLocality: 'Москва',
     addressRegion: 'Московская область',
     addressCountry: 'RU',

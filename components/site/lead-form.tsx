@@ -331,7 +331,7 @@ export function LeadForm({
                   id="lead-phone"
                   type="tel"
                   autoComplete="tel"
-                  placeholder="+7 (999) 000-00-00"
+                  placeholder="+7 (___) ___-__-__"
                   className={errors.phone ? inputErrorClass : inputClass}
                   aria-invalid={!!errors.phone}
                   {...register('phone')}
