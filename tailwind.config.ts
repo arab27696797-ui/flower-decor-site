@@ -27,6 +27,9 @@ const config: Config = {
           surface: '#FFFFFF',
           offset: '#F2EFE9',
 
+          // Dark premium theme — "Si-Si Noir"
+          onyx: '#0B0A08',
+          'onyx-soft': '#100E0C',
           midnight: '#141414',
           'midnight-soft': '#1B1A18',
           'midnight-card': '#211F1C',
@@ -68,6 +71,7 @@ const config: Config = {
         dropdown: '0 4px 16px 0 rgba(26, 26, 26, 0.10)',
         'dark-card': '0 10px 30px 0 rgba(0, 0, 0, 0.28)',
         'dark-hover': '0 18px 50px 0 rgba(0, 0, 0, 0.34)',
+        'gold-glow': '0 8px 32px -6px rgba(200, 169, 110, 0.45)',
       },
 
       maxWidth: {
@@ -100,12 +104,50 @@ const config: Config = {
           from: { opacity: '0', transform: 'scale(0.97)' },
           to: { opacity: '1', transform: 'scale(1)' },
         },
+        // Infinite horizontal marquee — translate -50% because content is duplicated
+        marquee: {
+          from: { transform: 'translateX(0)' },
+          to: { transform: 'translateX(-50%)' },
+        },
+        // Slow drifting aurora blobs — transform only, GPU-friendly
+        'aurora-drift': {
+          '0%, 100%': { transform: 'translate(0, 0) scale(1)' },
+          '33%': { transform: 'translate(4%, -6%) scale(1.08)' },
+          '66%': { transform: 'translate(-5%, 4%) scale(0.95)' },
+        },
+        'aurora-drift-alt': {
+          '0%, 100%': { transform: 'translate(0, 0) scale(1)' },
+          '50%': { transform: 'translate(-6%, -4%) scale(1.1)' },
+        },
+        // Gentle vertical float for hero imagery
+        float: {
+          '0%, 100%': { transform: 'translateY(0)' },
+          '50%': { transform: 'translateY(-14px)' },
+        },
+        // Moving sheen across gold buttons
+        sheen: {
+          from: { backgroundPosition: '200% center' },
+          to: { backgroundPosition: '-200% center' },
+        },
+        'pulse-dot': {
+          '0%, 100%': { opacity: '1', transform: 'scale(1)' },
+          '50%': { opacity: '0.45', transform: 'scale(0.8)' },
+        },
       },
 
       animation: {
         'slide-up': 'slide-up-fade 400ms cubic-bezier(0.16, 1, 0.3, 1) both',
         'fade-in': 'fade-in 300ms cubic-bezier(0.16, 1, 0.3, 1) both',
         'scale-in': 'scale-in 250ms cubic-bezier(0.16, 1, 0.3, 1) both',
+        marquee: 'marquee 36s linear infinite',
+        'marquee-slow': 'marquee 55s linear infinite',
+        'marquee-reverse': 'marquee 55s linear infinite reverse',
+        aurora: 'aurora-drift 18s ease-in-out infinite',
+        'aurora-alt': 'aurora-drift-alt 22s ease-in-out infinite',
+        float: 'float 7s ease-in-out infinite',
+        'float-slow': 'float 10s ease-in-out infinite',
+        sheen: 'sheen 5s linear infinite',
+        'pulse-dot': 'pulse-dot 2.2s ease-in-out infinite',
       },
 
       backdropBlur: {
