@@ -1,7 +1,7 @@
 'use client'
 
 // components/site/cookie-banner.tsx
-// Si-Si — Cookie consent banner.
+// Si-Si — Cookie consent banner, "Noir Bloom" dark glass restyle.
 // Compliant with Russian 152-FZ personal data requirements.
 // Shown on first visit; dismissed on accept.
 // Persistence: localStorage with a graceful in-memory fallback
@@ -14,7 +14,8 @@ import React, { useState, useEffect, useCallback } from 'react'
 import { useTranslations } from '@/lib/i18n'
 
 // ---------------------------------------------------------------------------
-// Storage key
+// Storage key — preserved across redesigns so returning visitors are not
+// asked again
 // ---------------------------------------------------------------------------
 
 const STORAGE_KEY = 'sisi_cookie_consent_v1'
@@ -57,7 +58,7 @@ export function CookieBanner() {
     const already = safeStorageGet(STORAGE_KEY)
     if (!already) {
       // Small delay so the banner appears after page paint, not immediately
-      const timer = setTimeout(() => setVisible(true), 800)
+      const timer = setTimeout(() => setVisible(true), 1200)
       return () => clearTimeout(timer)
     }
   }, [])
@@ -97,7 +98,7 @@ export function CookieBanner() {
       aria-label={regionLabel}
       aria-live="polite"
       className="
-        fixed bottom-0 left-0 right-0 z-50
+        fixed bottom-0 left-0 right-0 z-cookie
         px-4 pb-4 pt-0
         pointer-events-none
       "
@@ -107,17 +108,14 @@ export function CookieBanner() {
         className="
           pointer-events-auto
           mx-auto max-w-3xl
-          rounded-xl border border-brand-ink/10
-          bg-white/95 backdrop-blur-md
-          shadow-lg
+          glass-card
+          rounded-2xl
           px-5 py-4
           flex flex-col gap-3
           sm:flex-row sm:items-center sm:gap-5
-          animate-slide-up
+          shadow-dark-card
         "
         style={{
-          // Inline animation fallback for environments where
-          // Tailwind animate-slide-up is not configured
           animation: 'sisi-slide-up 0.35s cubic-bezier(0.16, 1, 0.3, 1) both',
         }}
       >
@@ -127,7 +125,7 @@ export function CookieBanner() {
           className="
             hidden sm:flex
             h-9 w-9 shrink-0 items-center justify-center
-            rounded-lg bg-brand-forest/8 text-brand-forest
+            rounded-xl border border-brand-gold/25 bg-brand-gold/[0.08] text-brand-gold
           "
         >
           <svg
@@ -141,21 +139,20 @@ export function CookieBanner() {
         </span>
 
         {/* ---- Text ----------------------------------------------------- */}
-        <p className="text-xs text-brand-ink/65 leading-relaxed flex-1">
+        <p className="flex-1 text-xs leading-relaxed text-brand-stone">
           {text}{' '}
           <a
             href={policyHref}
             className="
-              text-brand-forest underline underline-offset-2
-              hover:text-brand-forest/80
+              rounded-sm text-brand-gold underline underline-offset-2
+              transition-colors duration-150 hover:text-brand-gold-light
               focus-visible:outline-none focus-visible:ring-2
-              focus-visible:ring-brand-gold rounded-sm
-              transition-colors duration-150
+              focus-visible:ring-brand-gold
             "
           >
             {policyLinkText}
           </a>
-          {locale === 'ru' ? '.' : '.'}
+          .
         </p>
 
         {/* ---- Accept button ------------------------------------------- */}
@@ -164,14 +161,13 @@ export function CookieBanner() {
           onClick={handleAccept}
           aria-label={acceptLabel}
           className="
-            shrink-0 self-start sm:self-auto
-            rounded-lg bg-brand-forest px-4 py-2
-            text-xs font-semibold text-white
-            hover:bg-brand-forest/90 active:bg-brand-forest/80
-            transition-colors duration-150
+            shrink-0 self-start whitespace-nowrap sm:self-auto
+            rounded-lg bg-brand-gold px-4 py-2
+            text-xs font-semibold text-brand-ink
+            transition-colors duration-150 hover:bg-brand-gold-light
             focus-visible:outline-none focus-visible:ring-2
             focus-visible:ring-brand-gold focus-visible:ring-offset-2
-            whitespace-nowrap
+            focus-visible:ring-offset-brand-onyx
           "
         >
           {acceptLabel}
