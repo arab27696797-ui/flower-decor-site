@@ -21,6 +21,25 @@ function getChatId(): string {
   return chatId
 }
 
+/**
+ * Optional forum-topic support.
+ * Telegram supergroups with "Topics" enabled expose each topic as a
+ * message_thread_id. Set TELEGRAM_MESSAGE_THREAD_ID to post lead
+ * notifications into a specific topic; leave unset to post into the
+ * chat's default (General) topic — behaviour stays backward compatible.
+ */
+function getMessageThreadId(): number | undefined {
+  const raw = process.env.TELEGRAM_MESSAGE_THREAD_ID
+  if (!raw) return undefined
+  const parsed = Number.parseInt(raw, 10)
+  if (Number.isNaN(parsed)) {
+    throw new TelegramConfigError(
+      'TELEGRAM_MESSAGE_THREAD_ID is set but is not a valid number',
+    )
+  }
+  return parsed
+}
+
 // ---------------------------------------------------------------------------
 // Custom error class
 // ---------------------------------------------------------------------------
@@ -179,6 +198,7 @@ async function sendRawMessage(
   botToken: string,
   chatId: string,
   text: string,
+  messageThreadId?: number,
 ): Promise<TelegramSendResult> {
   const url = `https://api.telegram.org/bot${botToken}/sendMessage`
 
@@ -192,6 +212,10 @@ async function sendRawMessage(
         text,
         parse_mode: 'MarkdownV2',
         disable_web_page_preview: true,
+        // Present only when posting into a specific forum topic.
+        ...(messageThreadId !== undefined
+          ? { message_thread_id: messageThreadId }
+          : {}),
       }),
     })
   } catch (networkError) {
@@ -238,9 +262,10 @@ export async function sendLeadToTelegram(
 ): Promise<TelegramSendResult> {
   const botToken = getBotToken()  // throws TelegramConfigError if missing
   const chatId   = getChatId()    // throws TelegramConfigError if missing
+  const threadId = getMessageThreadId()  // optional — undefined when unset
 
   const message = formatLeadMessage(payload)
-  return sendRawMessage(botToken, chatId, message)
+  return sendRawMessage(botToken, chatId, message, threadId)
 }
 
 // ---------------------------------------------------------------------------
@@ -251,10 +276,12 @@ export async function sendLeadToTelegram(
 export async function verifyTelegramConfig(): Promise<TelegramSendResult> {
   let botToken: string
   let chatId: string
+  let threadId: number | undefined
 
   try {
     botToken = getBotToken()
     chatId   = getChatId()
+    threadId = getMessageThreadId()
   } catch (err) {
     return {
       success: false,
@@ -266,5 +293,6 @@ export async function verifyTelegramConfig(): Promise<TelegramSendResult> {
     botToken,
     chatId,
     '✅ Telegram-интеграция настроена корректно\\. Тестовое сообщение\\.',
+    threadId,
   )
 }
