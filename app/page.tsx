@@ -7,11 +7,11 @@
 //   The page composes accepted section components in conversion-optimised order.
 //
 // SECTION ORDER (conversion rationale):
-//   1. Navbar          — persistent navigation + language switcher + phone CTA
-//   2. HeroSection     — primary H1, value proposition, dual CTA, trust badges
+//   1. Navbar          — persistent navigation + language switcher + CTA
+//   2. HeroSection     — primary H1, value proposition, dual CTA, marquee
 //   3. ServicesSection — what we offer, anchor: #services
 //   4. AdvantagesSection — why us, social proof, differentiators, anchor: #advantages
-//   5. PortfolioPreview — completed works gallery (/api/portfolio), anchor: #portfolio
+//   5. PortfolioPreview — completed works marquee (/api/portfolio), anchor: #portfolio
 //   6. Calculator      — price estimator, anchor: #calculator (hero CTA target)
 //   7. LeadForm        — lead capture, anchor: #contact (calculator summary CTA target)
 //   8. ContactsSection — phone, Telegram, WhatsApp, service area, anchor: #contacts
@@ -24,18 +24,6 @@
 //   - One H1 only — rendered inside <HeroSection>.
 //   - Section heading hierarchy (H2 inside each section) is enforced in components.
 //   - Canonical URL is set via alternates.canonical.
-//
-// ANCHORS:
-//   The hero CTAs link to:
-//     href="#calculator"  — handled by <section id="calculator"> in this file
-//     href="tel:..."      — handled by ContactsSection phone constant
-//   The calculator summary "Submit" CTA links to:
-//     href="#contact"     — handled by <section id="contact"> in this file
-//
-// NOTE ON NEXT.CONFIG.TS:
-//   output: 'standalone' is set — this page is compiled to a standalone server file.
-//   No getServerSideProps or getStaticProps (App Router — uses fetch/async components).
-//   The page is fully statically renderable; no runtime DB calls at page level.
 
 import type { Metadata } from 'next'
 
@@ -63,8 +51,6 @@ import { CalculatorSummary }          from '@/components/site/calculator/calcula
 
 // ---------------------------------------------------------------------------
 // SEO Metadata — App Router export
-// Served as <head> tags on the page by Next.js at build time.
-// Update NEXT_PUBLIC_SITE_URL in .env.example / Railway env vars.
 // ---------------------------------------------------------------------------
 
 export const metadata: Metadata = {
@@ -85,7 +71,6 @@ export const metadata: Metadata = {
     'декор за 24 часа',
   ],
   alternates: {
-    // Canonical URL — replace with actual production domain once live.
     canonical: process.env.NEXT_PUBLIC_SITE_URL ?? 'https://si-si.ru',
   },
   openGraph: {
@@ -97,8 +82,6 @@ export const metadata: Metadata = {
     siteName: 'Si-Si',
     locale: 'ru_RU',
     type: 'website',
-    // og:image — uncomment and add final brand photograph when available:
-    // images: [{ url: '/og-cover.jpg', width: 1200, height: 630, alt: 'Si-Si — флористическое оформление' }],
   },
   twitter: {
     card: 'summary_large_image',
@@ -110,10 +93,6 @@ export const metadata: Metadata = {
 
 // ---------------------------------------------------------------------------
 // JSON-LD — LocalBusiness structured data
-// Injected as <script type="application/ld+json"> in the page <head>.
-// This tells Google search what kind of business this is, where it operates,
-// and what services it provides — critical for local SEO.
-// Update phone, email, and url before first public launch.
 // ---------------------------------------------------------------------------
 
 const jsonLdLocalBusiness = {
@@ -125,7 +104,7 @@ const jsonLdLocalBusiness = {
     'в Москве и Московской области. Под ключ за 24 часа.',
   url: process.env.NEXT_PUBLIC_SITE_URL ?? 'https://si-si.ru',
   telephone: '+79990000000',   // TODO: replace with real phone before launch
-  email: 'info@si-si.ru', // TODO: replace with real email before launch
+  email: 'info@si-si.ru',      // TODO: replace with real email before launch
   image: `${process.env.NEXT_PUBLIC_SITE_URL ?? 'https://si-si.ru'}/og-cover.jpg`,
   address: {
     '@type': 'PostalAddress',
@@ -158,38 +137,23 @@ const jsonLdLocalBusiness = {
     itemListElement: [
       {
         '@type': 'Offer',
-        itemOffered: {
-          '@type': 'Service',
-          name: 'Оформление искусственными цветами',
-        },
+        itemOffered: { '@type': 'Service', name: 'Оформление искусственными цветами' },
       },
       {
         '@type': 'Offer',
-        itemOffered: {
-          '@type': 'Service',
-          name: 'Оформление живыми цветами',
-        },
+        itemOffered: { '@type': 'Service', name: 'Оформление живыми цветами' },
       },
       {
         '@type': 'Offer',
-        itemOffered: {
-          '@type': 'Service',
-          name: 'Оформление воздушными шарами',
-        },
+        itemOffered: { '@type': 'Service', name: 'Оформление воздушными шарами' },
       },
       {
         '@type': 'Offer',
-        itemOffered: {
-          '@type': 'Service',
-          name: 'Срочный букет от 15 000 ₽',
-        },
+        itemOffered: { '@type': 'Service', name: 'Срочный букет от 15 000 ₽' },
       },
       {
         '@type': 'Offer',
-        itemOffered: {
-          '@type': 'Service',
-          name: 'Оформление мероприятий за 24 часа',
-        },
+        itemOffered: { '@type': 'Service', name: 'Оформление мероприятий за 24 часа' },
       },
     ],
   },
@@ -205,16 +169,11 @@ export default function HomePage() {
       {/* JSON-LD structured data for Google / Yandex local search */}
       <script
         type="application/ld+json"
-        // dangerouslySetInnerHTML is the correct App Router pattern for JSON-LD.
-        // The value is serialised from a static constant — no user input involved.
         // eslint-disable-next-line react/no-danger
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdLocalBusiness) }}
       />
 
-      {/* ------------------------------------------------------------------ */}
-      {/* Skip-to-content link — accessibility, keyboard navigation           */}
-      {/* Positioned off-screen until focused (styled in globals.css)         */}
-      {/* ------------------------------------------------------------------ */}
+      {/* Skip-to-content link — accessibility */}
       <a
         href="#main-content"
         className="
@@ -228,133 +187,103 @@ export default function HomePage() {
         Перейти к содержанию
       </a>
 
-      {/* ------------------------------------------------------------------ */}
-      {/* Sticky navigation — rendered outside <main> so it overlays content  */}
-      {/* ------------------------------------------------------------------ */}
+      {/* Sticky navigation — rendered outside <main> so it overlays content */}
       <Navbar />
 
-      {/* ------------------------------------------------------------------ */}
-      {/* Main page content                                                    */}
-      {/* id="main-content" is the skip-link target                           */}
-      {/* ------------------------------------------------------------------ */}
       <main id="main-content">
-
-        {/* 1. Hero — primary value proposition, H1, dual CTA */}
-        {/* id="hero" is set inside <HeroSection> itself       */}
+        {/* 1. Hero — primary value proposition, H1, dual CTA, services marquee */}
         <HeroSection />
 
-        {/* 2. Services — what the business actually offers
-               Anchor: #services — linked from navbar "Услуги" item */}
-        <section id="services" aria-label="Услуги оформления">
+        {/* 2. Services — bento grid of offerings
+               Anchor: #services */}
+        <section id="services" aria-label="Услуги оформления" className="scroll-mt-20">
           <ServicesSection />
         </section>
 
-        {/* 3. Advantages — trust signals, differentiators
+        {/* 3. Advantages — animated stats + trust cards
                Anchor: #advantages */}
-        <section id="advantages" aria-label="Наши преимущества">
+        <section id="advantages" aria-label="Наши преимущества" className="scroll-mt-20">
           <AdvantagesSection />
         </section>
 
-        {/* 3.5 Portfolio — completed works gallery, fed from /api/portfolio
-                Anchor: #portfolio */}
+        {/* 4. Portfolio — dual photo marquee from /api/portfolio
+               Anchor: #portfolio */}
         <section id="portfolio" aria-label="Портфолио" className="scroll-mt-20">
           <PortfolioPreview />
         </section>
 
-        {/* 4. Calculator — price estimator (multi-category accumulative cart)
-               Anchor: #calculator — this is the target of the hero primary CTA
-               The calculator is composed of four category input components
-               and a shared summary block that shows the live total. */}
+        {/* 5. Calculator — price estimator (multi-category accumulative cart)
+               Anchor: #calculator — target of the hero primary CTA.
+               Category cards on the left, sticky estimate panel on the right. */}
         <section
           id="calculator"
           aria-labelledby="calculator-heading"
-          className="scroll-mt-20"
+          className="relative scroll-mt-20 overflow-hidden bg-brand-onyx py-20 sm:py-24 lg:py-28"
         >
-          {/*
-            scroll-mt-20 (80px) compensates for the sticky navbar height
-            so the section heading is not hidden behind the nav when
-            the page scrolls to #calculator from the hero CTA.
-          */}
+          {/* Wine glow accent */}
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute left-[-10%] top-24 h-[26rem] w-[26rem] rounded-full bg-brand-wine/40 blur-3xl"
+          />
 
-          {/*
-            CALCULATOR LAYOUT:
-            The four category components are stacked vertically.
-            Each category writes its selections into the shared Zustand store
-            (components/site/calculator/calculator-cart.ts).
-            <CalculatorSummary> reads from the same store and renders
-            the live total + disclaimer + "Request this" CTA.
+          <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            {/* Section heading */}
+            <div className="mx-auto mb-14 max-w-2xl text-center">
+              <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.24em] text-brand-gold">
+                Калькулятор
+              </p>
+              <h2
+                id="calculator-heading"
+                className="font-display text-display-lg font-semibold text-brand-parchment"
+              >
+                Соберите свою{' '}
+                <span className="text-gold-gradient italic">смету</span>
+              </h2>
+              <p className="mt-4 text-sm leading-relaxed text-brand-stone sm:text-base">
+                Выберите один или несколько видов услуг — все позиции
+                автоматически суммируются в итоговую смету справа.
+              </p>
+            </div>
 
-            The category components are independent — the order here only
-            affects visual presentation. All state is shared via Zustand,
-            so removing or reordering components does not break accumulation.
-          */}
+            <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-[minmax(0,1fr)_380px] lg:gap-8">
+              {/* Category cards */}
+              <div className="flex flex-col gap-6">
+                {/* Category A — Floral decoration */}
+                <CalculatorCategoryFloral />
 
-          <div className="mx-auto max-w-4xl px-4 py-16 sm:px-6 sm:py-20 lg:py-24">
+                {/* Category B — Balloon decoration */}
+                <CalculatorCategoryBalloons />
 
-            <h2
-              id="calculator-heading"
-              className="font-display text-display-md text-brand-ink mb-3 text-center"
-            >
-              Рассчитайте стоимость
-            </h2>
-            <p className="text-center text-sm text-brand-stone mb-12 max-w-xl mx-auto">
-              Выберите один или несколько видов услуг. Все выбранные позиции
-              суммируются в итоговую смету автоматически.
-            </p>
+                {/* Category C — Urgent bouquet */}
+                <CalculatorCategoryBouquet />
 
-            {/* Category A — Floral decoration */}
-            <CalculatorCategoryFloral />
+                {/* Category D — General event decoration */}
+                <CalculatorCategoryEvent />
+              </div>
 
-            {/* Category B — Balloon decoration */}
-            <CalculatorCategoryBalloons />
-
-            {/* Category C — Urgent bouquet */}
-            <CalculatorCategoryBouquet />
-
-            {/* Category D — General event / entrance zone / wedding / corporate */}
-            <CalculatorCategoryEvent />
-
-            {/* Shared summary — reads from Zustand, shows total + disclaimer + CTA */}
-            <CalculatorSummary />
-
+              {/* Sticky estimate panel */}
+              <div className="lg:sticky lg:top-24">
+                <CalculatorSummary />
+              </div>
+            </div>
           </div>
         </section>
 
-        {/* 5. Lead form — contact capture
-               Anchor: #contact — target of the calculator summary CTA.
-               LeadFormWithCart is a client bridge: it reads the calculator
-               Zustand store and passes the live EstimateCart into LeadForm,
-               so the assembled estimate is attached to the submission. */}
-        <section
-          id="contact"
-          aria-labelledby="lead-form-heading"
-          className="scroll-mt-20"
-        >
+        {/* 6. Lead form — anchor: #contact (calculator summary CTA target) */}
+        <section id="contact" aria-label="Оставить заявку" className="scroll-mt-20">
           <LeadFormWithCart />
         </section>
 
-        {/* 6. Contacts — phone, Telegram, WhatsApp, service area
-               Anchor: #contacts — linked from navbar and footer */}
-        <section
-          id="contacts"
-          aria-label="Контакты и способы связи"
-          className="scroll-mt-20"
-        >
+        {/* 7. Contacts — anchor: #contacts */}
+        <section id="contacts" aria-label="Контакты" className="scroll-mt-20">
           <ContactsSection />
         </section>
 
+        {/* 8. Footer */}
+        <Footer />
       </main>
 
-      {/* ------------------------------------------------------------------ */}
-      {/* Footer — legal links, secondary nav, social media                   */}
-      {/* Rendered outside <main> — it is a site-wide landmark                */}
-      {/* ------------------------------------------------------------------ */}
-      <Footer />
-
-      {/* ------------------------------------------------------------------ */}
-      {/* Cookie consent banner — fixed overlay, outside page flow            */}
-      {/* Rendered after all content so it does not block LCP element         */}
-      {/* ------------------------------------------------------------------ */}
+      {/* 9. Cookie consent — fixed, outside page flow */}
       <CookieBanner />
     </>
   )
