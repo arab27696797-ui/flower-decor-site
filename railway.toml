@@ -16,33 +16,31 @@
 #                           next.config.ts (output: 'standalone').
 #
 # START COMMAND:
-#   `node .next/standalone/server.js` — runs the standalone Next.js server.
-#   This is the correct start command when output: 'standalone' is set in
-#   next.config.ts. It does NOT use `next start`, which requires the full
-#   node_modules tree and is not suitable for standalone output.
-#
-# PRISMA MIGRATIONS:
-#   `prisma migrate deploy` is NOT included in the build command here.
-#   Railway recommends running migrations as a separate one-off job or
-#   by adding it to a deploy hook, not as part of the build phase.
-#   For the first deploy, run manually from Railway CLI or dashboard:
-#     railway run npx prisma migrate deploy
-#   After that, add it to a Railway cron or pre-deploy command as needed.
+#   1. `npx prisma migrate deploy` — applies all pending migrations from
+#      prisma/migrations to the database. Idempotent: on subsequent starts
+#      it is a no-op when the schema is already up to date. This is what
+#      creates the Lead / PortfolioItem / SiteSettings tables on first boot.
+#      Requires DATABASE_URL to be set (Railway: Add Reference → Postgres).
+#      The `prisma` CLI is available at runtime because it is listed in
+#      package.json "dependencies" (not devDependencies).
+#   2. `node .next/standalone/server.js` — runs the standalone Next.js server.
 #
 # HEALTH CHECK:
 #   Railway will probe GET / on the public domain.
 #   The Next.js root page (app/page.tsx) returns HTTP 200 and is a correct
-#   healthcheck target. No custom /api/health endpoint is needed for first deploy.
+#   healthcheck target. healthcheckTimeout is raised to 120s because
+#   migrate deploy adds a few seconds to cold start.
 #
 # ENVIRONMENT VARIABLES (must be set in Railway dashboard):
-#   DATABASE_URL         — PostgreSQL connection string (auto-set if you attach
-#                          a Railway PostgreSQL service to this project).
-#   NEXT_PUBLIC_SITE_URL — canonical public URL, e.g. https://prima-decor.up.railway.app
-#   ADMIN_SECRET_KEY     — secret used for admin JWT signing (min 32 chars)
-#   TELEGRAM_BOT_TOKEN   — Telegram Bot API token for lead notifications
-#   TELEGRAM_CHAT_ID     — Telegram chat/group ID to receive lead messages
-#   NODE_ENV             — Railway sets this to "production" automatically.
-#                          Do NOT set it manually.
+#   DATABASE_URL               — PostgreSQL connection string (Add Reference
+#                                to the Railway Postgres service).
+#   NEXT_PUBLIC_SITE_URL       — canonical public URL.
+#   ADMIN_PASSWORD             — admin panel password.
+#   TELEGRAM_BOT_TOKEN         — Telegram Bot API token for lead notifications.
+#   TELEGRAM_CHAT_ID           — Telegram chat/group ID to receive lead messages.
+#   TELEGRAM_MESSAGE_THREAD_ID — optional forum topic ID inside the group.
+#   NODE_ENV                   — Railway sets this to "production" automatically.
+#                                Do NOT set it manually.
 
 [build]
   # Run Prisma client generation before the Next.js compiler starts.
@@ -52,10 +50,10 @@
   buildCommand = "npx prisma generate && npx next build && cp -r .next/static .next/standalone/.next/static"
 
 [deploy]
-  # Start the standalone Next.js server produced by `output: 'standalone'`
-  # in next.config.ts. Railway automatically sets PORT and HOSTNAME env vars;
-  # the standalone server reads them correctly.
-  startCommand  = "HOSTNAME=0.0.0.0 node .next/standalone/server.js"
+  # Apply migrations, then start the standalone Next.js server produced by
+  # `output: 'standalone'` in next.config.ts. Railway automatically sets PORT
+  # and HOSTNAME env vars; the standalone server reads them correctly.
+  startCommand  = "npx prisma migrate deploy && HOSTNAME=0.0.0.0 node .next/standalone/server.js"
 
   # Number of instances. Keep at 1 for first deploy to avoid shared in-memory
   # state issues (admin contact/pricing stores are still in-memory until the
@@ -65,7 +63,7 @@
   # Health check — Railway pings this path to confirm the deploy succeeded.
   # Next.js root page returns 200 OK, which is sufficient.
   healthcheckPath    = "/"
-  healthcheckTimeout = 30   # seconds to wait for 200 before marking deploy failed
+  healthcheckTimeout = 120  # seconds to wait for 200 before marking deploy failed
 
   # How long Railway gives the running process to gracefully shut down
   # before sending SIGKILL on redeploy.
