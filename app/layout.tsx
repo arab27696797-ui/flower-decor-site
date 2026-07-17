@@ -105,7 +105,7 @@ export default function RootLayout({
       <body
         className="
           min-h-dvh antialiased
-          bg-brand-cream text-brand-ink
+          bg-brand-onyx text-brand-parchment
           font-sans
         "
       >

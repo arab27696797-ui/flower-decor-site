@@ -6,7 +6,7 @@
 import ru from './translations/ru'
 import { en } from './translations/en'
 import type { Translations } from './translations/ru'
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 
 // ---------------------------------------------------------------------------
 // Locale types and constants
@@ -84,6 +84,14 @@ export function interpolate(
 
 let _currentLocale: Locale = DEFAULT_LOCALE
 
+// Subscribers so every mounted useTranslations() re-renders on locale change
+// (previously only the component that called setLocale updated).
+const _listeners = new Set<(locale: Locale) => void>()
+
+function _notify(locale: Locale): void {
+  _listeners.forEach((fn) => fn(locale))
+}
+
 export function initLocaleFromBrowser(): void {
   if (typeof navigator === 'undefined') return
   const browserLang = navigator.language?.slice(0, 2).toLowerCase()
@@ -98,6 +106,7 @@ export function getCurrentLocale(): Locale {
 
 export function setCurrentLocale(locale: Locale): void {
   _currentLocale = locale
+  _notify(locale)
 }
 
 // ---------------------------------------------------------------------------
@@ -114,9 +123,18 @@ export function useTranslations(fixedLocale?: Locale): {
     fixedLocale ?? _currentLocale,
   )
 
+  // Re-render when another component (e.g. the navbar switcher) changes locale
+  useEffect(() => {
+    if (fixedLocale) return
+    const handler = (next: Locale) => setLocaleState(next)
+    _listeners.add(handler)
+    return () => {
+      _listeners.delete(handler)
+    }
+  }, [fixedLocale])
+
   const setLocale = useCallback((next: Locale) => {
-    _currentLocale = next
-    setLocaleState(next)
+    setCurrentLocale(next)
 
     if (typeof document !== 'undefined') {
       document.documentElement.lang = LOCALE_HTML_LANG[next]
