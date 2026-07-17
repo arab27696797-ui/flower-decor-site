@@ -3,21 +3,32 @@
 // components/site/footer.tsx
 // Si-Si — site footer, "Noir Bloom" design.
 // Brand block + nav + socials + legal links, crowned by a giant ghost
-// wordmark. Placeholder contacts remain until the SEO batch.
+// wordmark. Real contacts + legal requisites from the company card.
 
 import Link from 'next/link'
 import { useTranslations } from '@/lib/i18n'
 
 // ---------------------------------------------------------------------------
-// Contact constants — PLACEHOLDERS, replaced in the SEO batch
+// Contact constants — real business contacts
 // ---------------------------------------------------------------------------
 
-const CONTACT_PHONE_DISPLAY   = '+7 (999) 000-00-00'
-const CONTACT_PHONE_TEL       = '+79990000000'
-const CONTACT_TELEGRAM_HANDLE = 'si-si_msk'
-const CONTACT_WHATSAPP_NUMBER = '79990000000'
-const CONTACT_EMAIL           = 'info@si-si.ru'
-const CONTACT_INSTAGRAM       = 'si-si.msk'
+const CONTACT_PHONE_DISPLAY   = '+7 (495) 792-18-98'
+const CONTACT_PHONE_TEL       = '+74957921898'
+const CONTACT_PHONE2_DISPLAY  = '+7 (903) 792-18-98'
+const CONTACT_PHONE2_TEL      = '+79037921898'
+const CONTACT_TELEGRAM_HANDLE = 'SI_SI_Dekor'
+const CONTACT_WHATSAPP_NUMBER = '79037921898'
+const CONTACT_EMAIL           = 'sisidekor860@xmail.ru'
+const CONTACT_INSTAGRAM       = 'si_si_dekor'
+
+// ---------------------------------------------------------------------------
+// Legal requisites — from the company card (ООО «АЛЬЯНС ПЛЮС»)
+// ---------------------------------------------------------------------------
+
+const LEGAL_ENTITY_NAME    = 'ООО «АЛЬЯНС ПЛЮС»'
+const LEGAL_ENTITY_INN     = '9724001157'
+const LEGAL_ENTITY_OGRN    = '1207700000100'
+const LEGAL_ENTITY_ADDRESS = '115409, г. Москва, Каширское ш., д. 48, к. 2, помещение 2П'
 
 // ---------------------------------------------------------------------------
 // Link groups
@@ -38,8 +49,6 @@ const NAV_LINKS: FooterLink[] = [
 
 const LEGAL_LINKS: FooterLink[] = [
   { labelRu: 'Политика конфиденциальности',   labelEn: 'Privacy Policy',       href: '/privacy-policy'       },
-  { labelRu: 'Обработка персональных данных', labelEn: 'Personal Data Policy', href: '/personal-data-policy' },
-  { labelRu: 'Политика cookie',               labelEn: 'Cookie Policy',        href: '/cookie-policy'        },
 ]
 
 // ---------------------------------------------------------------------------
@@ -144,6 +153,14 @@ export function Footer() {
               </li>
               <li>
                 <a
+                  href={`tel:${CONTACT_PHONE2_TEL}`}
+                  className="text-brand-parchment transition-colors hover:text-brand-gold-light"
+                >
+                  {CONTACT_PHONE2_DISPLAY}
+                </a>
+              </li>
+              <li>
+                <a
                   href={`mailto:${CONTACT_EMAIL}`}
                   className="text-brand-stone transition-colors hover:text-brand-parchment"
                 >
@@ -157,10 +174,20 @@ export function Footer() {
           </div>
         </div>
 
+        {/* Requisites — legal entity details from the company card */}
+        <div className="mt-12 border-t border-brand-midnight-border/70 pt-6">
+          <p className="text-xs leading-relaxed text-brand-stone/70">
+            {LEGAL_ENTITY_NAME} · ИНН {LEGAL_ENTITY_INN} · ОГРН {LEGAL_ENTITY_OGRN}
+            <br className="sm:hidden" />
+            <span className="hidden sm:inline"> · </span>
+            {LEGAL_ENTITY_ADDRESS}
+          </p>
+        </div>
+
         {/* Legal row */}
-        <div className="mt-12 flex flex-col gap-3 border-t border-brand-midnight-border/70 pt-6 sm:flex-row sm:items-center sm:justify-between">
+        <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <p className="text-xs text-brand-stone/70">
-            © {year} Si-Si. {locale === 'en' ? 'All rights reserved.' : 'Все права защищены.'}
+            © {year} Si-Si · {LEGAL_ENTITY_NAME}. {locale === 'en' ? 'All rights reserved.' : 'Все права защищены.'}
           </p>
           <ul className="flex flex-wrap gap-x-5 gap-y-2">
             {LEGAL_LINKS.map((link) => (

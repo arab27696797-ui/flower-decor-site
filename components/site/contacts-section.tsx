@@ -3,22 +3,22 @@
 // components/site/contacts-section.tsx
 // Si-Si — Contacts section, "Noir Bloom" design.
 // Contact channels as glass cards with gold icon chips; phone CTA with sheen.
-// Placeholder contact values remain — the SEO batch replaces them with
-// real phone / handles before launch.
 
 import { motion } from 'framer-motion'
 import { useTranslations } from '@/lib/i18n'
 
 // ---------------------------------------------------------------------------
-// Contact constants — PLACEHOLDERS, replaced in the SEO batch
+// Contact constants — real business contacts
 // ---------------------------------------------------------------------------
 
-const CONTACT_PHONE_DISPLAY   = '+7 (999) 000-00-00'
-const CONTACT_PHONE_TEL       = '+79990000000'      // tel: href — digits only
-const CONTACT_TELEGRAM_HANDLE = 'si-si_msk'         // without @
-const CONTACT_WHATSAPP_NUMBER = '79990000000'       // digits only, with country code
-const CONTACT_EMAIL           = 'info@si-si.ru'
-const CONTACT_INSTAGRAM       = 'si-si.msk'         // Instagram handle
+const CONTACT_PHONE_DISPLAY   = '+7 (495) 792-18-98'
+const CONTACT_PHONE_TEL       = '+74957921898'      // tel: href — digits only
+const CONTACT_PHONE2_DISPLAY  = '+7 (903) 792-18-98'
+const CONTACT_PHONE2_TEL      = '+79037921898'
+const CONTACT_TELEGRAM_HANDLE = 'SI_SI_Dekor'       // without @
+const CONTACT_WHATSAPP_NUMBER = '79037921898'       // digits only, with country code
+const CONTACT_EMAIL           = 'sisidekor860@xmail.ru'
+const CONTACT_INSTAGRAM       = 'si_si_dekor'       // Instagram handle
 
 // ---------------------------------------------------------------------------
 // Motion variants
@@ -88,7 +88,7 @@ export function ContactsSection() {
       label: 'WhatsApp',
       sublabel: locale === 'en' ? 'Photos, details, quotes' : 'Фото, детали, расчёт',
       href: `https://wa.me/${CONTACT_WHATSAPP_NUMBER}`,
-      value: CONTACT_PHONE_DISPLAY,
+      value: CONTACT_PHONE2_DISPLAY,
     },
     {
       kind: 'instagram' as const,
@@ -161,8 +161,11 @@ export function ContactsSection() {
               <p className="text-xs uppercase tracking-[0.18em] text-brand-stone">
                 {locale === 'en' ? 'Phone' : 'Телефон'}
               </p>
-              <p className="mt-2 font-display text-3xl font-semibold text-brand-parchment transition-colors group-hover:text-brand-gold-light">
+              <p className="mt-2 font-display text-2xl font-semibold text-brand-parchment transition-colors group-hover:text-brand-gold-light sm:text-3xl">
                 {CONTACT_PHONE_DISPLAY}
+              </p>
+              <p className="mt-1 font-display text-xl font-semibold text-brand-parchment/80 transition-colors group-hover:text-brand-gold-light sm:text-2xl">
+                {CONTACT_PHONE2_DISPLAY}
               </p>
               <p className="mt-2 text-sm text-brand-stone">
                 {locale === 'en'
