@@ -1,12 +1,11 @@
 'use client'
 
 // components/site/services-section.tsx
-// Si-Si — Services section.
-// Presents all 5 core service offerings with semantic HTML and responsive layout.
-// Uses useTranslations for all visible text.
-// Includes section-level CTA pointing to the calculator.
+// Si-Si — Services section, "Noir Bloom" design.
+// Bento-grid of glass cards with gold icon chips, tag pills and hover glow.
+// Motion: staggered reveal on scroll (opacity/transform only).
 
-import React from 'react'
+import { motion, useReducedMotion } from 'framer-motion'
 import { useTranslations } from '@/lib/i18n'
 
 // ---------------------------------------------------------------------------
@@ -14,319 +13,304 @@ import { useTranslations } from '@/lib/i18n'
 // ---------------------------------------------------------------------------
 
 interface ServiceDef {
-  id:            string
-  labelRu:       string
-  labelEn:       string
+  id:          string
+  labelRu:     string
+  labelEn:     string
   descriptionRu: string
   descriptionEn: string
-  detailRu:      string   // short supporting microcopy / key fact
-  detailEn:      string
-  icon:          React.ReactNode
-  accentClass:   string   // Tailwind background tint for the icon container
-  badge?:        { ru: string; en: string }
-}
-
-// Inline SVG icons — no external dependency, monochrome, uses currentColor
-function IconFlowerArtificial() {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}
-      strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className="h-6 w-6">
-      <circle cx="12" cy="12" r="2.5" />
-      <ellipse cx="12" cy="5.5" rx="2" ry="3.5" />
-      <ellipse cx="12" cy="18.5" rx="2" ry="3.5" />
-      <ellipse cx="5.5" cy="12" rx="3.5" ry="2" />
-      <ellipse cx="18.5" cy="12" rx="3.5" ry="2" />
-      <ellipse cx="7.3" cy="7.3" rx="2" ry="3.5" transform="rotate(45 7.3 7.3)" />
-      <ellipse cx="16.7" cy="7.3" rx="2" ry="3.5" transform="rotate(-45 16.7 7.3)" />
-      <ellipse cx="7.3" cy="16.7" rx="2" ry="3.5" transform="rotate(-45 7.3 16.7)" />
-      <ellipse cx="16.7" cy="16.7" rx="2" ry="3.5" transform="rotate(45 16.7 16.7)" />
-    </svg>
-  )
-}
-
-function IconFlowerFresh() {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}
-      strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className="h-6 w-6">
-      <path d="M12 22 V10" />
-      <path d="M12 10 C12 10 7 9 6 5 C9 4 12 7 12 10Z" />
-      <path d="M12 10 C12 10 17 9 18 5 C15 4 12 7 12 10Z" />
-      <path d="M12 14 C12 14 8 13 6 16 C8 18 12 16 12 14Z" />
-      <path d="M12 14 C12 14 16 13 18 16 C16 18 12 16 12 14Z" />
-      <circle cx="12" cy="10" r="1.5" fill="currentColor" stroke="none" opacity="0.4" />
-    </svg>
-  )
-}
-
-function IconBalloon() {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}
-      strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className="h-6 w-6">
-      <ellipse cx="12" cy="9" rx="5" ry="6.5" />
-      <path d="M12 15.5 L11 19 M12 15.5 L13 19" />
-      <path d="M10 19 Q12 21 14 19" />
-      <circle cx="7" cy="7" r="3.5" />
-      <circle cx="17" cy="7" r="3.5" />
-      <path d="M7 10.5 L6.5 14" />
-      <path d="M17 10.5 L17.5 14" />
-    </svg>
-  )
-}
-
-function IconBouquet() {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}
-      strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className="h-6 w-6">
-      <path d="M12 20 L9 14 L15 14 Z" />
-      <circle cx="12" cy="7" r="2" />
-      <circle cx="7.5" cy="9.5" r="1.8" />
-      <circle cx="16.5" cy="9.5" r="1.8" />
-      <circle cx="9" cy="5.5" r="1.5" />
-      <circle cx="15" cy="5.5" r="1.5" />
-      <path d="M9 14 C9 14 7 11 7.5 9.5" strokeDasharray="none" />
-      <path d="M15 14 C15 14 17 11 16.5 9.5" />
-    </svg>
-  )
-}
-
-function IconEvent() {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}
-      strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className="h-6 w-6">
-      <rect x="3" y="8" width="18" height="13" rx="2" />
-      <path d="M3 12 H21" />
-      <path d="M8 8 V5 M16 8 V5" />
-      <path d="M8 16 L10 18 L16 13" />
-    </svg>
-  )
+  tagsRu:      string[]
+  tagsEn:      string[]
+  icon:        'flower' | 'balloon' | 'bouquet' | 'sparkle' | 'arch' | 'camera'
+  // Bento placement: 'wide' spans two columns on desktop
+  size:        'wide' | 'regular'
 }
 
 const SERVICES: ServiceDef[] = [
   {
-    id:            'artificial-flowers',
-    labelRu:       'Искусственные цветы',
-    labelEn:       'Artificial Flowers',
-    descriptionRu: 'Долговечные флористические композиции из premium-материалов. Идеальны для входных групп, шоу-румов и постоянных экспозиций.',
-    descriptionEn: 'Long-lasting floral arrangements from premium materials. Perfect for entrance zones, showrooms, and permanent displays.',
-    detailRu:      'Не вянут · Круглогодично · Без замены',
-    detailEn:      'Never wilt · Year-round · No replacement',
-    icon:          <IconFlowerArtificial />,
-    accentClass:   'bg-brand-blush/30 text-brand-forest',
+    id: 'floral',
+    labelRu: 'Флористическое оформление',
+    labelEn: 'Floral decoration',
+    descriptionRu:
+      'Искусственные и живые цветы любой сложности — от камерных композиций до тотального оформления зала. Каталог из 1 200+ позиций всегда в наличии.',
+    descriptionEn:
+      'Artificial and fresh florals of any complexity — from intimate compositions to full venue styling. A catalogue of 1,200+ items always in stock.',
+    tagsRu: ['Искусственные цветы', 'Живые цветы', 'Тотальный декор'],
+    tagsEn: ['Artificial flowers', 'Fresh flowers', 'Full styling'],
+    icon: 'flower',
+    size: 'wide',
   },
   {
-    id:            'fresh-flowers',
-    labelRu:       'Живые цветы',
-    labelEn:       'Fresh Flowers',
-    descriptionRu: 'Живые цветочные оформления для торжественных событий. Доставка свежих цветов, составление композиций и монтаж на месте.',
-    descriptionEn: 'Fresh floral designs for ceremonial events. Same-day delivery, on-site arrangement, and installation.',
-    detailRu:      'Сезонные и экзотические сорта · Монтаж на месте',
-    detailEn:      'Seasonal & exotic varieties · On-site installation',
-    icon:          <IconFlowerFresh />,
-    accentClass:   'bg-green-50 text-brand-forest',
+    id: 'balloons',
+    labelRu: 'Воздушные шары',
+    labelEn: 'Balloons',
+    descriptionRu:
+      'Гирлянды, арки и фотозоны из шаров премиум-класса. Не выцветают и держат форму до 5 дней.',
+    descriptionEn:
+      'Premium balloon garlands, arches and photo zones. Colourfast, holding shape for up to 5 days.',
+    tagsRu: ['Гирлянды', 'Арки', 'Фотозоны'],
+    tagsEn: ['Garlands', 'Arches', 'Photo zones'],
+    icon: 'balloon',
+    size: 'regular',
   },
   {
-    id:            'balloons',
-    labelRu:       'Воздушные шары',
-    labelEn:       'Balloon Decoration',
-    descriptionRu: 'Арки, гирлянды, колонны и инсталляции из воздушных шаров для корпоративов, свадеб и детских праздников.',
-    descriptionEn: 'Arches, garlands, columns, and balloon installations for corporate events, weddings, and children\'s parties.',
-    detailRu:      'Любой масштаб · Тематические цвета · Фотозоны',
-    detailEn:      'Any scale · Themed colours · Photo zones',
-    icon:          <IconBalloon />,
-    accentClass:    'bg-sky-50 text-sky-700',
+    id: 'bouquet',
+    labelRu: 'Срочный букет',
+    labelEn: 'Express bouquet',
+    descriptionRu:
+      'Авторский букет за 2 часа по Москве. От 15 000 ₽ — привозим точно к моменту.',
+    descriptionEn:
+      'A signature bouquet in 2 hours across Moscow. From 15,000 ₽ — delivered right on the moment.',
+    tagsRu: ['За 2 часа', 'От 15 000 ₽'],
+    tagsEn: ['In 2 hours', 'From 15,000 ₽'],
+    icon: 'bouquet',
+    size: 'regular',
   },
   {
-    id:            'urgent-bouquet',
-    labelRu:       'Срочный букет от 15 000 ₽',
-    labelEn:       'Urgent Bouquet from ₽15,000',
-    descriptionRu: 'Авторские букеты и цветочные подарки с курьерской доставкой. Принимаем заказ и привозим в день обращения.',
-    descriptionEn: 'Bespoke bouquets and floral gifts with courier delivery. Ordered and delivered on the same day.',
-    detailRu:      'В день обращения · Курьер по Москве и МО',
-    detailEn:      'Same-day delivery · Courier across Moscow & MO',
-    icon:          <IconBouquet />,
-    accentClass:   'bg-brand-gold/15 text-amber-700',
-    badge:         { ru: 'Срочно', en: 'Urgent' },
+    id: 'event',
+    labelRu: 'Мероприятия под ключ',
+    labelEn: 'Full-service events',
+    descriptionRu:
+      'Свадьбы, корпоративы и гала-вечера: идея, 3D-эскиз, декор, доставка, монтаж и демонтаж. Один договор — ноль хлопот.',
+    descriptionEn:
+      'Weddings, corporate and gala evenings: concept, 3D sketch, decor, delivery, setup and teardown. One contract — zero hassle.',
+    tagsRu: ['Свадьбы', 'Корпоративы', '24 часа'],
+    tagsEn: ['Weddings', 'Corporate', '24 hours'],
+    icon: 'sparkle',
+    size: 'wide',
   },
   {
-    id:            'event-decoration',
-    labelRu:       'Оформление мероприятий за 24 часа',
-    labelEn:       'Event Decoration in 24 Hours',
-    descriptionRu: 'Свадьбы, корпоративы, входные группы, гала-вечера. Полный цикл: идея, декор, материалы, доставка, монтаж и демонтаж.',
-    descriptionEn: 'Weddings, corporate events, entrance zones, gala evenings. Full cycle: concept, décor, materials, delivery, installation and removal.',
-    detailRu:      'Под ключ · Москва и МО · Начало работ через 24 ч после оплаты',
-    detailEn:      'Turnkey · Moscow & MO · Work starts within 24 h of payment',
-    icon:          <IconEvent />,
-    accentClass:   'bg-brand-forest/8 text-brand-forest',
-    badge:         { ru: '24 часа', en: '24 hours' },
+    id: 'entrance',
+    labelRu: 'Входные группы',
+    labelEn: 'Entrance groups',
+    descriptionRu:
+      'Оформление входов и фасадов, которые останавливают поток. Первое впечатление начинается с порога.',
+    descriptionEn:
+      'Entrance and facade styling that stops foot traffic. The first impression starts at the doorstep.',
+    tagsRu: ['Фасады', 'Порталы'],
+    tagsEn: ['Facades', 'Portals'],
+    icon: 'arch',
+    size: 'regular',
+  },
+  {
+    id: 'photozone',
+    labelRu: 'Фотозоны',
+    labelEn: 'Photo zones',
+    descriptionRu:
+      'Инстаграмные точки притяжения: цветочные стены, неон, каскады ткани. Гости сами делают вам рекламу.',
+    descriptionEn:
+      'Instagram-worthy attractions: flower walls, neon, cascading fabrics. Guests advertise you themselves.',
+    tagsRu: ['Цветочные стены', 'Неон'],
+    tagsEn: ['Flower walls', 'Neon'],
+    icon: 'camera',
+    size: 'regular',
   },
 ]
 
 // ---------------------------------------------------------------------------
-// Service card sub-component
+// Icons — inline SVG, stroke-based, inherit currentColor (gold)
 // ---------------------------------------------------------------------------
 
-interface ServiceCardProps {
-  service: ServiceDef
-  locale:  'ru' | 'en'
-}
-
-function ServiceCard({ service, locale }: ServiceCardProps) {
-  const label       = locale === 'en' ? service.labelEn       : service.labelRu
-  const description = locale === 'en' ? service.descriptionEn : service.descriptionRu
-  const detail      = locale === 'en' ? service.detailEn      : service.detailRu
-  const badge       = service.badge
-    ? (locale === 'en' ? service.badge.en : service.badge.ru)
-    : null
-
-  return (
-    <article
-      aria-label={label}
-      className="
-        group relative flex flex-col gap-4
-        rounded-xl border border-brand-ink/8
-        bg-white p-5
-        shadow-sm hover:shadow-md
-        transition-shadow duration-300
-      "
-    >
-      {/* Badge — urgent / 24h */}
-      {badge && (
-        <span
-          aria-label={badge}
-          className="
-            absolute top-4 right-4
-            rounded-full bg-brand-gold/20 border border-brand-gold/40
-            px-2.5 py-0.5 text-xs font-semibold text-amber-700
-            tracking-wide
-          "
-        >
-          {badge}
-        </span>
-      )}
-
-      {/* Icon container */}
-      <div
-        className={`
-          flex h-11 w-11 items-center justify-center rounded-lg
-          ${service.accentClass}
-          transition-transform duration-300 group-hover:scale-105
-        `}
-        aria-hidden="true"
-      >
-        {service.icon}
-      </div>
-
-      {/* Heading */}
-      <h3 className="font-display text-base font-semibold text-brand-forest leading-snug pr-8">
-        {label}
-      </h3>
-
-      {/* Description */}
-      <p className="text-sm text-brand-ink/70 leading-relaxed flex-1">
-        {description}
-      </p>
-
-      {/* Detail microcopy */}
-      <p className="text-xs text-brand-ink/45 leading-relaxed border-t border-brand-ink/6 pt-3">
-        {detail}
-      </p>
-    </article>
-  )
+function ServiceIcon({ icon }: { icon: ServiceDef['icon'] }) {
+  const common = 'h-6 w-6'
+  switch (icon) {
+    case 'flower':
+      return (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" className={common} aria-hidden="true">
+          <circle cx="12" cy="8" r="2.4" />
+          <path d="M12 5.6c0-1.8 1.2-3 3-3.6M12 5.6C12 3.8 10.8 2.6 9 2" opacity="0.001" />
+          <path d="M12 5.6v0" opacity="0.001" />
+          <path d="M9.9 7.1C8.4 5.6 6.2 5.4 4.7 6.6c-1 1.6-.2 3.8 1.4 4.9" />
+          <path d="M14.1 7.1c1.5-1.5 3.7-1.7 5.2-.5 1 1.6.2 3.8-1.4 4.9" />
+          <path d="M9.6 9.7c-1.9.7-2.9 2.7-2.2 4.5 1.4 1.1 3.6.8 4.9-.5" />
+          <path d="M14.4 9.7c1.9.7 2.9 2.7 2.2 4.5-1.4 1.1-3.6.8-4.9-.5" />
+          <path d="M12 10.4V21" />
+          <path d="M12 16c-2.2 0-4-1.4-4.5-3.4" />
+          <path d="M12 18.5c2.2 0 4-1.4 4.5-3.4" />
+        </svg>
+      )
+    case 'balloon':
+      return (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" className={common} aria-hidden="true">
+          <path d="M12 2.5c3.2 0 5.5 2.4 5.5 5.6 0 3.6-3.1 6.6-5.5 6.6s-5.5-3-5.5-6.6c0-3.2 2.3-5.6 5.5-5.6Z" />
+          <path d="M12 14.7l-.9 1.6h1.8l-.9-1.6Z" fill="currentColor" stroke="none" />
+          <path d="M12 16.3c0 2-1.4 2.6-1.4 4.2" />
+        </svg>
+      )
+    case 'bouquet':
+      return (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" className={common} aria-hidden="true">
+          <path d="M8.5 2.8c1.8.4 2.8 1.8 3 3.5" />
+          <path d="M15.5 2.8c-1.8.4-2.8 1.8-3 3.5" />
+          <path d="M12 6.3c.2-1.7 1.5-3 3.2-3.3" opacity="0.001" />
+          <circle cx="7.6" cy="5.6" r="1.7" />
+          <circle cx="16.4" cy="5.6" r="1.7" />
+          <circle cx="12" cy="4.4" r="1.7" />
+          <path d="M6.5 9.5 12 21l5.5-11.5" />
+          <path d="M6.5 9.5h11" />
+        </svg>
+      )
+    case 'sparkle':
+      return (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" className={common} aria-hidden="true">
+          <path d="M12 3v0c.6 4.5 2.7 6.6 7.2 7.2-4.5.6-6.6 2.7-7.2 7.2-.6-4.5-2.7-6.6-7.2-7.2 4.5-.6 6.6-2.7 7.2-7.2Z" />
+          <path d="M19 15.5c.2 1.6 1 2.4 2.5 2.6-1.5.2-2.3 1-2.5 2.6-.2-1.6-1-2.4-2.5-2.6 1.5-.2 2.3-1 2.5-2.6Z" />
+        </svg>
+      )
+    case 'arch':
+      return (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" className={common} aria-hidden="true">
+          <path d="M4 21V10a8 8 0 0 1 16 0v11" />
+          <path d="M8.5 21v-9a3.5 3.5 0 0 1 7 0v9" />
+          <path d="M2.5 21h19" />
+        </svg>
+      )
+    case 'camera':
+      return (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" className={common} aria-hidden="true">
+          <path d="M4 8.5A1.5 1.5 0 0 1 5.5 7h2L9 4.8A1.2 1.2 0 0 1 10.1 4h3.8A1.2 1.2 0 0 1 15 4.8L16.5 7h2A1.5 1.5 0 0 1 20 8.5v9a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 17.5v-9Z" />
+          <circle cx="12" cy="13" r="3.4" />
+        </svg>
+      )
+  }
 }
 
 // ---------------------------------------------------------------------------
-// Main section
+// Motion variants
+// ---------------------------------------------------------------------------
+
+const grid = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.08 } },
+}
+
+const card = {
+  hidden: { opacity: 0, y: 28 },
+  show: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.7, ease: 'easeOut' as const },
+  },
+}
+
+// ---------------------------------------------------------------------------
+// Component
 // ---------------------------------------------------------------------------
 
 export function ServicesSection() {
   const { locale } = useTranslations()
-
-  const sectionTitle = locale === 'en'
-    ? 'Our Services'
-    : 'Наши услуги'
-
-  const sectionSubtitle = locale === 'en'
-    ? 'Full-service floral and event decoration across Moscow and the Moscow region. We handle everything — concept to removal.'
-    : 'Флористический декор и оформление мероприятий в Москве и МО. Всё под ключ — от идеи до демонтажа.'
-
-  const ctaLabel = locale === 'en'
-    ? 'Calculate cost and timeline →'
-    : 'Рассчитать стоимость и сроки →'
-
-  const urgentNote = locale === 'en'
-    ? '⚡ Urgent projects accepted same day. Call us or fill in the form.'
-    : '⚡ Срочные проекты принимаем в день обращения. Позвоните или оставьте заявку.'
+  const reduceMotion = useReducedMotion()
 
   return (
-    <section
-      id="services"
-      aria-labelledby="services-heading"
-      className="mx-auto max-w-6xl px-4 py-16 sm:px-6 md:py-24"
-    >
-      {/* ---- Section header -------------------------------------------- */}
-      <div className="max-w-2xl mb-10 md:mb-14">
-        <h2
-          id="services-heading"
-          className="font-display text-display-lg text-brand-ink leading-tight"
+    <div className="relative overflow-hidden bg-brand-onyx py-20 sm:py-24 lg:py-28">
+      {/* Soft wine glow, top-right */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute -top-40 right-[-15%] h-[28rem] w-[28rem] rounded-full bg-brand-wine/50 blur-3xl"
+      />
+
+      <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        {/* Section heading */}
+        <motion.div
+          initial={reduceMotion ? false : { opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-80px' }}
+          transition={{ duration: 0.7, ease: 'easeOut' }}
+          className="mx-auto mb-14 max-w-2xl text-center"
         >
-          {sectionTitle}
-        </h2>
-        <p className="mt-3 text-base text-brand-ink/65 leading-relaxed">
-          {sectionSubtitle}
-        </p>
-      </div>
+          <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.24em] text-brand-gold">
+            {locale === 'en' ? 'What we do' : 'Что мы делаем'}
+          </p>
+          <h2 className="font-display text-display-lg font-semibold text-brand-parchment">
+            {locale === 'en' ? (
+              <>
+                Services built around{' '}
+                <span className="text-gold-gradient italic">your moment</span>
+              </>
+            ) : (
+              <>
+                Услуги, собранные вокруг{' '}
+                <span className="text-gold-gradient italic">вашего момента</span>
+              </>
+            )}
+          </h2>
+          <p className="mt-4 text-sm leading-relaxed text-brand-stone sm:text-base">
+            {locale === 'en'
+              ? 'From a single bouquet to full-scale venue transformation — every format is produced in-house and installed by our own crew.'
+              : 'От одного букета до тотальной трансформации зала — каждый формат производится в нашей мастерской и монтируется своей командой.'}
+          </p>
+        </motion.div>
 
-      {/* ---- Service cards grid ---------------------------------------- */}
-      {/* 5 cards: 1 col → 2 col → 3 col with last row auto-centred */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {SERVICES.map((service) => (
-          <ServiceCard
-            key={service.id}
-            service={service}
-            locale={locale}
-          />
-        ))}
-      </div>
-
-      {/* ---- Urgent note ------------------------------------------------ */}
-      <div className="mt-8 rounded-xl bg-brand-gold/8 border border-brand-gold/25 px-5 py-4">
-        <p className="text-sm text-brand-ink/75 leading-relaxed">
-          {urgentNote}
-        </p>
-      </div>
-
-      {/* ---- Section CTA ----------------------------------------------- */}
-      <div className="mt-8 flex flex-col items-start gap-3 sm:flex-row sm:items-center">
-        <a
-          href="#calculator"
-          className="
-            inline-flex items-center gap-2 rounded-lg
-            bg-brand-forest px-5 py-3
-            text-sm font-semibold text-white
-            hover:bg-brand-forest/90 active:bg-brand-forest/80
-            transition-colors duration-150
-            focus-visible:outline-none focus-visible:ring-2
-            focus-visible:ring-brand-gold focus-visible:ring-offset-2
-          "
+        {/* Bento grid */}
+        <motion.div
+          variants={grid}
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true, margin: '-60px' }}
+          className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 lg:gap-5"
         >
-          {ctaLabel}
-        </a>
+          {SERVICES.map((service) => (
+            <motion.article
+              key={service.id}
+              variants={card}
+              className={[
+                'glass-card glow-hover group relative flex flex-col gap-4 rounded-card p-6 transition-shadow duration-slow lg:p-7',
+                service.size === 'wide' ? 'sm:col-span-2' : '',
+              ].join(' ')}
+            >
+              {/* Icon chip */}
+              <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-brand-gold/25 bg-brand-gold/[0.08] text-brand-gold transition-colors duration-slow group-hover:border-brand-gold/50 group-hover:text-brand-gold-light">
+                <ServiceIcon icon={service.icon} />
+              </div>
 
-        <a
-          href="#lead-form"
-          className="
-            text-sm font-medium text-brand-forest/70
-            hover:text-brand-forest underline underline-offset-4
-            transition-colors duration-150
-            focus-visible:outline-none focus-visible:ring-2
-            focus-visible:ring-brand-gold rounded
-          "
+              <div className="flex flex-1 flex-col gap-2">
+                <h3 className="font-display text-xl font-semibold text-brand-parchment lg:text-2xl">
+                  {locale === 'en' ? service.labelEn : service.labelRu}
+                </h3>
+                <p className="text-sm leading-relaxed text-brand-stone">
+                  {locale === 'en' ? service.descriptionEn : service.descriptionRu}
+                </p>
+              </div>
+
+              {/* Tags */}
+              <ul className="mt-auto flex flex-wrap gap-2 pt-1" aria-label={locale === 'en' ? 'Formats' : 'Форматы'}>
+                {(locale === 'en' ? service.tagsEn : service.tagsRu).map((tag) => (
+                  <li
+                    key={tag}
+                    className="rounded-full border border-brand-midnight-border bg-brand-midnight-soft/60 px-3 py-1 text-[11px] font-medium tracking-wide text-brand-stone"
+                  >
+                    {tag}
+                  </li>
+                ))}
+              </ul>
+
+              {/* Gold corner accent on hover */}
+              <span
+                aria-hidden="true"
+                className="pointer-events-none absolute right-5 top-5 h-1.5 w-1.5 rounded-full bg-brand-gold/0 transition-colors duration-slow group-hover:bg-brand-gold"
+              />
+            </motion.article>
+          ))}
+        </motion.div>
+
+        {/* Section CTA */}
+        <motion.div
+          initial={reduceMotion ? false : { opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6, ease: 'easeOut', delay: 0.15 }}
+          className="mt-12 text-center"
         >
-          {locale === 'en' ? 'Or submit a request' : 'Или оставить заявку'}
-        </a>
+          <a
+            href="#calculator"
+            className="btn-gold-sheen animate-sheen inline-flex min-h-11 items-center gap-2 rounded-btn px-7 py-3 text-sm font-semibold text-brand-ink shadow-gold-glow transition-transform duration-base hover:-translate-y-0.5"
+          >
+            {locale === 'en' ? 'Estimate my decor' : 'Рассчитать мой декор'}
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4" aria-hidden="true">
+              <path d="M4 10h12M11 5l5 5-5 5" />
+            </svg>
+          </a>
+        </motion.div>
       </div>
-    </section>
+    </div>
   )
 }
-
-export default ServicesSection
