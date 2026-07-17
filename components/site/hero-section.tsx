@@ -1,181 +1,290 @@
 'use client'
 
-import { motion, useReducedMotion } from 'framer-motion'
+// components/site/hero-section.tsx
+// Si-Si — flagship hero, "Noir Bloom" design.
+// Signature elements: drifting aurora gradients, film grain, mouse-parallax
+// floating imagery, staggered headline reveal, sheen CTA, services marquee.
+// All animation is opacity/transform only; honors prefers-reduced-motion.
+
+import { useCallback } from 'react'
+import {
+  motion,
+  useReducedMotion,
+  useMotionValue,
+  useSpring,
+  useTransform,
+} from 'framer-motion'
 import { useTranslations } from '@/lib/i18n'
 
-const HERO_IMAGE_URL =
-  'https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=1600&q=80&auto=format&fit=crop'
+const HERO_MAIN =
+  'https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=900&q=80&auto=format&fit=crop'
+const HERO_SECONDARY =
+  'https://images.unsplash.com/photo-1469371670807-013ccf25f16a?w=600&q=80&auto=format&fit=crop'
+
+const MARQUEE_RU = [
+  'Свадьбы', 'Корпоративы', 'Входные группы', 'Фотозоны',
+  'Срочные букеты', 'Воздушные шары', 'Дни рождения', 'Гала-вечера',
+]
+const MARQUEE_EN = [
+  'Weddings', 'Corporate', 'Entrance zones', 'Photo zones',
+  'Urgent bouquets', 'Balloons', 'Birthdays', 'Gala evenings',
+]
+
+const container = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.09, delayChildren: 0.15 } },
+}
+
+const lineReveal = {
+  hidden: { opacity: 0, y: 34 },
+  show: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.85, ease: 'easeOut' as const },
+  },
+}
 
 export function HeroSection() {
-  const { t } = useTranslations()
+  const { locale } = useTranslations()
   const reduceMotion = useReducedMotion()
 
-  const sectionAnimation = reduceMotion
-    ? {
-        initial: { opacity: 0 },
-        whileInView: { opacity: 1 },
-        transition: { duration: 0.45, ease: 'easeOut' as const },
-      }
-    : {
-        initial: { opacity: 0, y: 24 },
-        whileInView: { opacity: 1, y: 0 },
-        transition: { duration: 0.7, ease: 'easeOut' as const },
-      }
+  // Mouse parallax for the floating image cluster
+  const mx = useMotionValue(0)
+  const my = useMotionValue(0)
+  const sx = useSpring(mx, { stiffness: 55, damping: 18, mass: 0.6 })
+  const sy = useSpring(my, { stiffness: 55, damping: 18, mass: 0.6 })
+  const mainX = useTransform(sx, [-0.5, 0.5], [12, -12])
+  const mainY = useTransform(sy, [-0.5, 0.5], [8, -8])
+  const secX = useTransform(sx, [-0.5, 0.5], [-20, 20])
+  const secY = useTransform(sy, [-0.5, 0.5], [-14, 14])
 
-  const hoverLift = reduceMotion
-    ? {}
-    : {
-        whileHover: { y: -4 },
-        transition: { duration: 0.2, ease: 'easeOut' as const },
-      }
+  const handleMouseMove = useCallback(
+    (e: React.MouseEvent<HTMLElement>) => {
+      if (reduceMotion) return
+      const rect = e.currentTarget.getBoundingClientRect()
+      mx.set((e.clientX - rect.left) / rect.width - 0.5)
+      my.set((e.clientY - rect.top) / rect.height - 0.5)
+    },
+    [mx, my, reduceMotion],
+  )
+
+  const marqueeItems = locale === 'en' ? MARQUEE_EN : MARQUEE_RU
+  const marqueeRow = [...marqueeItems, ...marqueeItems]
 
   return (
     <section
       id="hero"
-      aria-label={t.hero.ariaLabel}
-      className="relative overflow-hidden bg-brand-midnight text-brand-parchment"
+      aria-label={locale === 'en' ? 'Hero' : 'Главный экран'}
+      onMouseMove={handleMouseMove}
+      className="relative overflow-hidden bg-brand-onyx text-brand-parchment"
     >
+      {/* ---------------------------------------------------------------- */}
+      {/* Aurora background + grain                                         */}
+      {/* ---------------------------------------------------------------- */}
       <div aria-hidden="true" className="pointer-events-none absolute inset-0">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(200,169,110,0.16),transparent_32%),radial-gradient(circle_at_bottom_left,rgba(87,28,36,0.34),transparent_36%)]" />
-        <div className="absolute inset-0 bg-gradient-to-b from-brand-midnight via-brand-midnight/90 to-brand-wine/95" />
+        <div className="absolute -top-32 right-[-10%] h-[34rem] w-[34rem] rounded-full bg-brand-gold/15 blur-3xl animate-aurora" />
+        <div className="absolute bottom-[-20%] left-[-12%] h-[38rem] w-[38rem] rounded-full bg-brand-wine/60 blur-3xl animate-aurora-alt" />
+        <div className="absolute left-1/3 top-1/4 h-72 w-72 rounded-full bg-brand-gold/10 blur-3xl animate-aurora" />
+        <div className="absolute inset-0 bg-gradient-to-b from-brand-onyx/40 via-transparent to-brand-onyx" />
       </div>
+      <div aria-hidden="true" className="grain-overlay absolute inset-0" />
 
-      <div aria-hidden="true" className="absolute inset-0 hidden md:block">
-        <img
-          src={HERO_IMAGE_URL}
-          alt=""
-          role="presentation"
-          width={1600}
-          height={1067}
-          loading="eager"
-          decoding="async"
-          className="h-full w-full object-cover object-center opacity-[0.18]"
-        />
-        <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(20,20,20,0.96)_0%,rgba(20,20,20,0.88)_46%,rgba(20,20,20,0.56)_100%)]" />
-      </div>
+      {/* ---------------------------------------------------------------- */}
+      {/* Main grid                                                         */}
+      {/* ---------------------------------------------------------------- */}
+      <div className="relative mx-auto grid min-h-[100svh] max-w-7xl grid-cols-1 items-center gap-12 px-4 pb-24 pt-28 sm:px-6 md:grid-cols-[minmax(0,1.05fr)_minmax(320px,0.95fr)] md:pb-16 md:pt-32 lg:px-8">
 
-      <div className="relative mx-auto grid min-h-[100svh] max-w-7xl grid-cols-1 items-center gap-10 px-4 py-20 sm:px-6 md:min-h-[92svh] md:grid-cols-[minmax(0,1.1fr)_minmax(320px,0.9fr)] md:gap-12 md:py-24 lg:px-8 lg:py-28">
+        {/* Left — copy */}
         <motion.div
-          initial={sectionAnimation.initial}
-          whileInView={sectionAnimation.whileInView}
-          viewport={{ once: true, amount: 0.2 }}
-          transition={sectionAnimation.transition}
-          className="flex max-w-3xl flex-col gap-6"
+          variants={container}
+          initial="hidden"
+          animate="show"
+          className="flex max-w-3xl flex-col gap-7"
         >
-          <p className="inline-flex min-h-11 w-fit items-center gap-2 rounded-full border border-brand-gold/35 bg-brand-gold/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.22em] text-brand-gold">
-            <span className="h-2 w-2 rounded-full bg-brand-gold" />
-            {t.hero.eyebrow}
-          </p>
+          <motion.p
+            variants={lineReveal}
+            className="inline-flex min-h-11 w-fit items-center gap-2.5 rounded-full border border-brand-gold/30 bg-brand-gold/[0.07] px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.24em] text-brand-gold"
+          >
+            <span className="h-1.5 w-1.5 rounded-full bg-brand-gold animate-pulse-dot" />
+            {locale === 'en'
+              ? 'Premium event decor · Moscow'
+              : 'Премиальный декор мероприятий · Москва'}
+          </motion.p>
 
-          <h1 className="max-w-[12ch] font-display text-display-xl font-semibold leading-[1.02] tracking-[-0.02em] text-brand-parchment">
-            {t.hero.heading.line1}
-            <br />
-            <span className="text-brand-gold">{t.hero.heading.line2}</span>
-            <br />
-            <span className="text-brand-parchment">{t.hero.heading.line3}</span>
-          </h1>
+          <motion.h1
+            variants={lineReveal}
+            className="max-w-[13ch] font-display text-display-xl font-semibold leading-[1.03] tracking-[-0.02em]"
+          >
+            {locale === 'en' ? (
+              <>
+                Decor that turns
+                <br />
+                <span className="text-gold-gradient italic">an evening</span>
+                <br />
+                into a memory
+              </>
+            ) : (
+              <>
+                Декор, после
+                <br />
+                <span className="text-gold-gradient italic">которого</span>
+                <br />
+                помнят вечер
+              </>
+            )}
+          </motion.h1>
 
-          <p className="max-w-[58ch] text-base leading-7 text-brand-stone sm:text-lg sm:leading-8">
-            {t.hero.subheading}
-          </p>
+          <motion.p
+            variants={lineReveal}
+            className="max-w-[54ch] text-base leading-7 text-brand-stone sm:text-lg sm:leading-8"
+          >
+            {locale === 'en'
+              ? 'Fresh floristry, balloons and textile installations — composed into one visual story of your event. Concept, materials, delivery, installation and teardown: we start within 24 hours.'
+              : 'Живая флористика, шары и текстильные инсталляции — собранные в единую историю вашего события. Идея, материалы, доставка, монтаж и демонтаж: стартуем за 24 часа.'}
+          </motion.p>
 
-          <div className="flex flex-col gap-3 pt-2 sm:flex-row sm:flex-wrap">
-            <motion.a
+          <motion.div variants={lineReveal} className="flex flex-col gap-3 pt-1 sm:flex-row sm:flex-wrap">
+            <a
               href="#calculator"
-              {...hoverLift}
               className="
-                inline-flex min-h-11 items-center justify-center gap-2
-                rounded-card border border-brand-gold/70
-                bg-brand-gold px-6 py-3
-                text-sm font-semibold text-brand-midnight
-                shadow-dark-card
-                transition-[background-color,box-shadow,transform] duration-200
-                hover:bg-brand-gold-light hover:shadow-dark-hover
+                btn-gold-sheen animate-sheen
+                inline-flex min-h-12 items-center justify-center gap-2
+                rounded-card px-7 py-3.5
+                text-sm font-semibold text-brand-onyx
+                shadow-gold-glow
+                transition-transform duration-200 ease-out-expo
+                hover:-translate-y-0.5
                 focus-visible:outline-none focus-visible:ring-2
                 focus-visible:ring-brand-gold focus-visible:ring-offset-2
-                focus-visible:ring-offset-brand-midnight
+                focus-visible:ring-offset-brand-onyx
               "
             >
-              {t.hero.ctaPrimary}
-            </motion.a>
+              {locale === 'en' ? 'Get an estimate' : 'Получить расчёт'}
+              <span aria-hidden="true">→</span>
+            </a>
 
-            <motion.a
+            <a
               href="#contact"
-              {...hoverLift}
               className="
-                inline-flex min-h-11 items-center justify-center gap-2
+                inline-flex min-h-12 items-center justify-center gap-2
                 rounded-card border border-brand-parchment/15
-                bg-brand-parchment/5 px-6 py-3
+                bg-brand-parchment/[0.04] px-7 py-3.5
                 text-sm font-semibold text-brand-parchment
-                shadow-dark-card backdrop-blur-sm
-                transition-[background-color,border-color,box-shadow,transform] duration-200
-                hover:border-brand-gold/40 hover:bg-brand-parchment/10 hover:shadow-dark-hover
+                backdrop-blur-sm
+                transition-all duration-200 ease-out-expo
+                hover:-translate-y-0.5 hover:border-brand-gold/40 hover:bg-brand-parchment/10
                 focus-visible:outline-none focus-visible:ring-2
                 focus-visible:ring-brand-gold focus-visible:ring-offset-2
-                focus-visible:ring-offset-brand-midnight
+                focus-visible:ring-offset-brand-onyx
               "
             >
-              {t.hero.ctaSecondary}
-            </motion.a>
-          </div>
+              {locale === 'en' ? 'Leave a request' : 'Оставить заявку'}
+            </a>
+          </motion.div>
 
-          <div className="flex flex-col gap-2 pt-2 text-sm text-brand-stone sm:flex-row sm:flex-wrap sm:gap-x-6 sm:gap-y-2">
+          <motion.div
+            variants={lineReveal}
+            className="flex flex-col gap-2 pt-1 text-sm text-brand-stone sm:flex-row sm:flex-wrap sm:gap-x-6"
+          >
             {[
-              { icon: '⚡', text: t.hero.trust.speed },
-              { icon: '🌸', text: t.hero.trust.quality },
-              { icon: '📍', text: t.hero.trust.location },
-            ].map(({ icon, text }) => (
+              locale === 'en' ? 'Start within 24 hours' : 'Выезд в течение 24 часов',
+              locale === 'en' ? 'Fresh flowers only' : 'Только свежие цветы',
+              locale === 'en' ? 'Moscow & region' : 'Москва и область',
+            ].map((text) => (
               <span key={text} className="flex items-center gap-2">
-                <span aria-hidden="true" className="text-base">
-                  {icon}
-                </span>
-                <span>{text}</span>
+                <span aria-hidden="true" className="h-1 w-1 rounded-full bg-brand-gold" />
+                {text}
               </span>
             ))}
-          </div>
+          </motion.div>
         </motion.div>
 
-        <motion.div
-          initial={sectionAnimation.initial}
-          whileInView={sectionAnimation.whileInView}
-          viewport={{ once: true, amount: 0.2 }}
-          transition={
-            reduceMotion
-              ? { duration: 0.45, ease: 'easeOut' as const, delay: 0.05 }
-              : { duration: 0.8, ease: 'easeOut' as const, delay: 0.1 }
-          }
-          className="relative"
-        >
-          <div className="relative overflow-hidden rounded-[28px] border border-brand-parchment/10 bg-brand-midnight-card shadow-dark-card">
-            <img
-              src={HERO_IMAGE_URL}
-              alt={t.hero.imageAlt}
-              width={760}
-              height={920}
-              loading="eager"
-              decoding="async"
-              className="aspect-[4/5] w-full object-cover object-center"
-            />
-            <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(20,20,20,0.1)_0%,rgba(20,20,20,0.34)_45%,rgba(20,20,20,0.74)_100%)]" />
-
-            <div className="absolute inset-x-0 bottom-0 flex flex-col gap-3 p-5 sm:p-6">
-              <div className="w-fit rounded-full border border-brand-gold/30 bg-brand-midnight/60 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-brand-gold backdrop-blur-sm">
-                {t.hero.photoLabel}
-              </div>
-
-              <div className="max-w-[30ch] rounded-2xl border border-brand-parchment/10 bg-brand-midnight/55 p-4 backdrop-blur-md">
-                <p className="text-sm leading-6 text-brand-parchment">
-                  Si-Si — декор с характером: вечерний свет, флористика, фотозоны и сцены, которые держат внимание с первого взгляда.
-                </p>
-              </div>
+        {/* Right — floating image cluster with mouse parallax */}
+        <div className="relative hidden md:block">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.96 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 1, ease: 'easeOut' as const, delay: 0.25 }}
+            style={reduceMotion ? undefined : { x: mainX, y: mainY }}
+            className="relative ml-auto w-[78%]"
+          >
+            <div className="overflow-hidden rounded-[28px] border border-brand-parchment/10 shadow-dark-card animate-float-slow">
+              <img
+                src={HERO_MAIN}
+                alt={
+                  locale === 'en'
+                    ? 'Floral wedding arch by Si-Si'
+                    : 'Цветочная свадебная арка от Si-Si'
+                }
+                width={760}
+                height={950}
+                loading="eager"
+                decoding="async"
+                className="aspect-[4/5] w-full object-cover object-center"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-brand-onyx/60 via-transparent to-transparent" />
             </div>
-          </div>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 24 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.9, ease: 'easeOut' as const, delay: 0.5 }}
+            style={reduceMotion ? undefined : { x: secX, y: secY }}
+            className="absolute -left-4 bottom-10 w-[46%]"
+          >
+            <div className="overflow-hidden rounded-[20px] border border-brand-gold/20 shadow-gold-glow animate-float">
+              <img
+                src={HERO_SECONDARY}
+                alt={
+                  locale === 'en'
+                    ? 'Decorated banquet table'
+                    : 'Оформленный банкетный стол'
+                }
+                width={480}
+                height={360}
+                loading="eager"
+                decoding="async"
+                className="aspect-[4/3] w-full object-cover object-center"
+              />
+            </div>
+            <div className="glass-card mt-3 rounded-2xl p-3.5">
+              <p className="text-xs leading-5 text-brand-stone">
+                {locale === 'en'
+                  ? 'Si-Si — decor with character: evening light, floristry, photo zones.'
+                  : 'Si-Si — декор с характером: вечерний свет, флористика, фотозоны.'}
+              </p>
+            </div>
+          </motion.div>
 
           <div
             aria-hidden="true"
-            className="absolute -bottom-5 -left-5 hidden h-28 w-28 rounded-full border border-brand-gold/20 bg-brand-gold/10 blur-2xl md:block"
+            className="absolute -right-6 -top-6 h-24 w-24 rounded-full border border-brand-gold/25"
           />
-        </motion.div>
+        </div>
+      </div>
+
+      {/* ---------------------------------------------------------------- */}
+      {/* Services marquee                                                  */}
+      {/* ---------------------------------------------------------------- */}
+      <div className="relative border-y border-brand-parchment/[0.07] bg-brand-onyx-soft/60 py-4 backdrop-blur-sm">
+        <div className="overflow-hidden">
+          <div className="flex w-max animate-marquee items-center gap-8 whitespace-nowrap pr-8">
+            {[0, 1].map((dup) => (
+              <div key={dup} aria-hidden={dup === 1} className="flex items-center gap-8">
+                {marqueeRow.map((item, i) => (
+                  <span
+                    key={`${dup}-${i}`}
+                    className="flex items-center gap-8 text-[11px] font-semibold uppercase tracking-[0.26em] text-brand-stone"
+                  >
+                    {item}
+                    <span aria-hidden="true" className="text-brand-gold">✦</span>
+                  </span>
+                ))}
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     </section>
   )
