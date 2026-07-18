@@ -116,7 +116,7 @@ export function ContactsSection() {
           transition={{ duration: 0.7, ease: 'easeOut' }}
           className="mx-auto mb-14 max-w-2xl text-center"
         >
-          <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.24em] text-brand-gold">
+          <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.24em] text-brand-gold-dark">
             {locale === 'en' ? 'Contacts' : 'Контакты'}
           </p>
           <h2 className="font-display text-display-lg font-semibold text-brand-parchment">
