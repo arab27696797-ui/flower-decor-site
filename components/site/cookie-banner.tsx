@@ -1,199 +1,134 @@
 'use client'
 
 // components/site/cookie-banner.tsx
-// Si-Si — Cookie consent banner, "Noir Bloom" dark glass restyle.
-// Compliant with Russian 152-FZ personal data requirements.
-// Shown on first visit; dismissed on accept.
-// Persistence: localStorage with a graceful in-memory fallback
-// (localStorage may be blocked in sandboxed iframes — the fallback
-// keeps the banner hidden for the session without crashing).
-// Position: fixed bottom bar — does NOT block the viewport.
-// Accessible: role="region", aria-label, focus-visible rings.
+// Si-Si — cookie consent banner.
+// Slides up on first visit; persists choice in localStorage.
+// Dismisses itself permanently after acceptance.
 
-import React, { useState, useEffect, useCallback } from 'react'
+import { useEffect, useState } from 'react'
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
 import { useTranslations } from '@/lib/i18n'
 
-// ---------------------------------------------------------------------------
-// Storage key — preserved across redesigns so returning visitors are not
-// asked again
-// ---------------------------------------------------------------------------
-
-const STORAGE_KEY = 'sisi_cookie_consent_v1'
-
-// ---------------------------------------------------------------------------
-// Safe storage helpers — graceful fallback when localStorage is unavailable
-// ---------------------------------------------------------------------------
-
-function safeStorageGet(key: string): string | null {
-  try {
-    return localStorage.getItem(key)
-  } catch {
-    return null
-  }
-}
-
-function safeStorageSet(key: string, value: string): void {
-  try {
-    localStorage.setItem(key, value)
-  } catch {
-    // Silently fail — in-memory state handles the session
-  }
-}
-
-// ---------------------------------------------------------------------------
-// Cookie Banner component
-// ---------------------------------------------------------------------------
+const STORAGE_KEY = 'sisi-cookie-consent-v1'
 
 export function CookieBanner() {
   const { locale } = useTranslations()
-
-  // ---- Visibility state ---------------------------------------------------
-  // Start hidden (false) to avoid flash on SSR hydration.
-  // After mount we check storage and show if consent not yet given.
+  const reduceMotion = useReducedMotion()
   const [visible, setVisible] = useState(false)
-  const [mounted, setMounted] = useState(false)
 
+  // Show only when no stored choice exists
   useEffect(() => {
-    setMounted(true)
-    const already = safeStorageGet(STORAGE_KEY)
-    if (!already) {
-      // Small delay so the banner appears after page paint, not immediately
-      const timer = setTimeout(() => setVisible(true), 1200)
-      return () => clearTimeout(timer)
+    try {
+      if (window.localStorage.getItem(STORAGE_KEY) === null) {
+        const timer = setTimeout(() => setVisible(true), 1800)
+        return () => clearTimeout(timer)
+      }
+    } catch {
+      // localStorage unavailable (private mode) — show banner anyway
+      setVisible(true)
     }
   }, [])
 
-  // ---- Accept handler -----------------------------------------------------
-  const handleAccept = useCallback(() => {
-    safeStorageSet(STORAGE_KEY, 'accepted')
+  const accept = () => {
+    try {
+      window.localStorage.setItem(STORAGE_KEY, 'accepted')
+    } catch {
+      /* noop */
+    }
     setVisible(false)
-  }, [])
+  }
 
-  // ---- Do not render anything on server or when already accepted ----------
-  if (!mounted || !visible) return null
-
-  // ---- Localised strings --------------------------------------------------
-  const text = locale === 'en'
-    ? 'We use cookies and similar technologies to ensure the website works correctly, analyse traffic, and improve the user experience. By continuing to use the site, you consent to their use in accordance with our'
-    : 'Мы используем файлы cookie и аналогичные технологии для корректной работы сайта, анализа трафика и улучшения пользовательского опыта. Продолжая использовать сайт, вы даёте согласие на их обработку в соответствии с нашей'
-
-  const policyLinkText = locale === 'en'
-    ? 'Privacy Policy'
-    : 'Политикой конфиденциальности'
-
-  const acceptLabel = locale === 'en'
-    ? 'Accept and continue'
-    : 'Принять и продолжить'
-
-  const policyHref = '/privacy-policy'
-
-  const regionLabel = locale === 'en'
-    ? 'Cookie consent notice'
-    : 'Уведомление об использовании файлов cookie'
-
-  // -------------------------------------------------------------------------
   return (
-    <div
-      role="region"
-      aria-label={regionLabel}
-      aria-live="polite"
-      className="
-        fixed bottom-0 left-0 right-0 z-cookie
-        px-4 pb-4 pt-0
-        pointer-events-none
-      "
-    >
-      {/* Inner banner — pointer-events re-enabled on the card only */}
-      <div
-        className="
-          pointer-events-auto
-          mx-auto max-w-3xl
-          glass-card
-          rounded-2xl
-          px-5 py-4
-          flex flex-col gap-3
-          sm:flex-row sm:items-center sm:gap-5
-          shadow-dark-card
-        "
-        style={{
-          animation: 'sisi-slide-up 0.35s cubic-bezier(0.16, 1, 0.3, 1) both',
-        }}
-      >
-        {/* ---- Icon ---------------------------------------------------- */}
-        <span
-          aria-hidden="true"
+    <AnimatePresence>
+      {visible && (
+        <motion.div
+          initial={reduceMotion ? { opacity: 0 } : { opacity: 0, y: 32 }}
+          animate={reduceMotion ? { opacity: 1 } : { opacity: 1, y: 0 }}
+          exit={reduceMotion ? { opacity: 0 } : { opacity: 0, y: 32 }}
+          transition={{ duration: 0.45, ease: 'easeOut' }}
+          role="dialog"
+          aria-live="polite"
+          aria-label={locale === 'en' ? 'Cookie notice' : 'Уведомление о cookie'}
           className="
-            hidden sm:flex
-            h-9 w-9 shrink-0 items-center justify-center
-            rounded-xl border border-brand-gold/25 bg-brand-gold/[0.08] text-brand-gold
+            fixed bottom-4 left-4 right-4 z-[90]
+            sm:bottom-6 sm:left-6 sm:right-auto sm:max-w-md
           "
         >
-          <svg
-            viewBox="0 0 24 24" fill="none" stroke="currentColor"
-            strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round"
-            className="h-4 w-4" aria-hidden="true"
-          >
-            <circle cx="12" cy="12" r="10" />
-            <path d="M12 8 v4 M12 16 h.01" />
-          </svg>
-        </span>
+          <div className="glass-card rounded-card p-5 shadow-dark-card">
+            <div className="flex items-start gap-3.5">
+              {/* Cookie icon */}
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-brand-gold/25 bg-brand-gold/[0.08] text-brand-gold">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5" aria-hidden="true">
+                  <path d="M12 2a10 10 0 1 0 10 10 4 4 0 0 1-5-5 4 4 0 0 1-5-5Z" />
+                  <path d="M8.5 8.5v.01" />
+                  <path d="M16 15.5v.01" />
+                  <path d="M12 12v.01" />
+                  <path d="M11 17v.01" />
+                  <path d="M7 14v.01" />
+                </svg>
+              </div>
 
-        {/* ---- Text ----------------------------------------------------- */}
-        <p className="flex-1 text-xs leading-relaxed text-brand-stone">
-          {text}{' '}
-          <a
-            href={policyHref}
-            className="
-              rounded-sm text-brand-gold underline underline-offset-2
-              transition-colors duration-150 hover:text-brand-gold-light
-              focus-visible:outline-none focus-visible:ring-2
-              focus-visible:ring-brand-gold
-            "
-          >
-            {policyLinkText}
-          </a>
-          .
-        </p>
+              <div className="min-w-0 flex-1">
+                <p className="text-sm font-medium text-brand-parchment">
+                  {locale === 'en' ? 'We use cookies' : 'Мы используем cookie'}
+                </p>
+                <p className="mt-1 text-xs leading-relaxed text-brand-stone">
+                  {locale === 'en' ? (
+                    <>
+                      They help the site work and let us understand how it is used. Details in the{' '}
+                      <a
+                        href="/privacy-policy"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="
+                          rounded-sm text-brand-gold-dark underline underline-offset-2
+                          transition-colors duration-150 hover:text-brand-gold
+                        "
+                      >
+                        privacy policy
+                      </a>
+                      .
+                    </>
+                  ) : (
+                    <>
+                      Они нужны для работы сайта и помогают понять, как им пользуются. Подробнее — в{' '}
+                      <a
+                        href="/privacy-policy"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="
+                          rounded-sm text-brand-gold-dark underline underline-offset-2
+                          transition-colors duration-150 hover:text-brand-gold
+                        "
+                      >
+                        политике конфиденциальности
+                      </a>
+                      .
+                    </>
+                  )}
+                </p>
 
-        {/* ---- Accept button ------------------------------------------- */}
-        <button
-          type="button"
-          onClick={handleAccept}
-          aria-label={acceptLabel}
-          className="
-            shrink-0 self-start whitespace-nowrap sm:self-auto
-            rounded-lg bg-brand-gold px-4 py-2
-            text-xs font-semibold text-brand-ink
-            transition-colors duration-150 hover:bg-brand-gold-light
-            focus-visible:outline-none focus-visible:ring-2
-            focus-visible:ring-brand-gold focus-visible:ring-offset-2
-            focus-visible:ring-offset-brand-onyx
-          "
-        >
-          {acceptLabel}
-        </button>
-      </div>
-
-      {/* ---- Keyframe definition — scoped inline to avoid globals dependency */}
-      <style>{`
-        @keyframes sisi-slide-up {
-          from {
-            opacity: 0;
-            transform: translateY(16px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-        @media (prefers-reduced-motion: reduce) {
-          @keyframes sisi-slide-up {
-            from { opacity: 0; }
-            to   { opacity: 1; }
-          }
-        }
-      `}</style>
-    </div>
+                <div className="mt-3.5 flex items-center gap-3">
+                  <button
+                    type="button"
+                    onClick={accept}
+                    className="
+                      inline-flex min-h-9 items-center justify-center rounded-btn
+                      border border-brand-gold/70 bg-brand-gold px-4 py-1.5
+                      text-xs font-semibold text-brand-midnight
+                      transition-all duration-150 hover:bg-brand-gold-light
+                      focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-gold
+                    "
+                  >
+                    {locale === 'en' ? 'Accept & continue' : 'Принять и продолжить'}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   )
 }
 
