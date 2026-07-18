@@ -72,7 +72,7 @@ function CartItemRow({ item, locale, compact, onRemove }: CartItemRowProps) {
           }
           className="
             shrink-0 rounded text-xs text-brand-stone/70
-            transition-colors hover:text-red-400
+            transition-colors hover:text-red-600
             focus-visible:outline-none focus-visible:ring-1
             focus-visible:ring-brand-gold
           "
@@ -253,7 +253,7 @@ export function CalculatorSummary({
           onClick={clearCart}
           className="
             rounded text-xs text-brand-stone/70 transition-colors
-            hover:text-red-400 focus-visible:outline-none
+            hover:text-red-600 focus-visible:outline-none
             focus-visible:ring-1 focus-visible:ring-brand-gold
           "
         >
