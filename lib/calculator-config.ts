@@ -129,7 +129,7 @@ export function applyMarkup(base: number, coefficient: number): number {
   return Math.round(base * coefficient)
 }
 
-export const DEFAULT_MARKUP = 1.3
+export const DEFAULT_MARKUP = 3.0
 export const MARKUP_FACTOR = DEFAULT_MARKUP
 export const MARKUP_MULTIPLIER = DEFAULT_MARKUP
 
