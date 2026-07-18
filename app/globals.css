@@ -1,261 +1,198 @@
 /* app/globals.css
- * Si-Si — Global CSS foundation ("Noir" dark premium theme).
- * Layer order: Tailwind base → Tailwind components → Tailwind utilities → custom layers.
- * Brand tokens, typography defaults, motion utilities, and focus/selection styles.
- * Complements tailwind.config.ts (brand-* colors, font-display/sans, display sizes).
- */
-
-/* --------------------------------------------------------------------------
- * Tailwind directive layers
- * ----------------------------------------------------------------------- */
+   Si-Si — Global CSS foundation (light festive theme — ivory, gold, blush).
+   Imported once in app/layout.tsx. Contains:
+     1. Font-face helpers (via next/font CSS variables, defined in layout)
+     2. CSS custom properties (design tokens)
+     3. Base element styles (selection, scrollbar, focus)
+     4. Custom utility classes — signature festive effects
+     5. Reduced-motion guard
+*/
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* --------------------------------------------------------------------------
- * CSS custom properties — brand palette (mirrors tailwind.config.ts so the
- * tokens are also available in plain CSS for pseudo-elements, SVG fill, etc.)
- * ----------------------------------------------------------------------- */
+/* -------------------------------------------------------------------------- */
+/* 1. Design tokens (CSS custom properties)                                   */
+/* -------------------------------------------------------------------------- */
 
 :root {
+  /* Brand palette — mirrors tailwind.config.ts for non-Tailwind contexts */
+  --color-onyx:           #FBF6EC;
+  --color-onyx-soft:      #F7EEDC;
+  --color-midnight:       #FFFCF6;
+  --color-midnight-soft:  #FFF9EE;
+  --color-midnight-card:  #FFFDF9;
+  --color-midnight-border:#E9DCC3;
+
+  --color-parchment:      #33231A;
+  --color-stone:          #8A7663;
+  --color-stone-soft:     #83705D;
+
+  --color-gold:           #AE8A3E;
+  --color-gold-light:     #C8A96E;
+  --color-gold-dark:      #8A6A28;
+  --color-wine:           #E7AAB9;
+  --color-moss:           #2D5016;
+
+  /* Film grain texture — subtle SVG turbulence, inlined */
+  --grain-url: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160' viewBox='0 0 160 160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
+
+  /* Ease curves */
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* Color scheme hint for native widgets (scrollbars, form controls) */
   color-scheme: light;
-
-  /* Brand palette — keep in sync with tailwind.config.ts */
-  --color-cream:        #FAF8F5;
-  --color-forest:       #2D5016;
-  --color-forest-dark:  #1E3610;
-  --color-forest-light: #3D6B20;
-  --color-gold:         #C8A96E;
-  --color-gold-light:   #D9BF92;
-  --color-gold-dark:    #A8863E;
-  --color-blush:        #E8C5C5;
-  --color-blush-light:  #F2DADA;
-  --color-ink:          #1A1A1A;
-  --color-ink-muted:    rgba(26, 26, 26, 0.65);
-  --color-ink-faint:    rgba(26, 26, 26, 0.35);
-  --color-ink-hairline: rgba(26, 26, 26, 0.10);
-  --color-white:        #FFFFFF;
-
-  /* Festive light palette (token values mirror tailwind.config.ts) */
-  --color-onyx:          #FBF6EC;
-  --color-onyx-soft:     #F5EDDC;
-  --color-midnight:      #FFFCF6;
-  --color-midnight-soft: #FFFFFF;
-  --color-midnight-card: #FFFFFF;
-  --color-wine:          #E7AAB9;
-  --color-parchment:     #33231A;
-  --color-stone:         #8A7663;
-  --color-stone-soft:    #A8978A;
-
-  /* Semantic surface layers (light) */
-  --color-surface-base:   var(--color-onyx);
-  --color-surface-card:   var(--color-midnight-card);
-  --color-surface-offset: var(--color-onyx-soft);
-  --color-surface-dark:   var(--color-midnight);
-  --color-border:         rgba(51, 35, 26, 0.10);
-  --color-border-strong:  rgba(51, 35, 26, 0.18);
-
-  /* Focus ring */
-  --color-focus-ring: var(--color-gold);
-
-  /* Font variables — values injected at runtime by next/font/google in layout.tsx */
-  --font-display: var(--font-cormorant), Georgia, 'Times New Roman', serif;
-  --font-body:    var(--font-inter), system-ui, -apple-system, sans-serif;
-
-  /* Fluid type scale — mirrors tailwind.config.ts fontSize for raw CSS use */
-  --text-display-xl: clamp(2.5rem, 6vw,   5rem);
-  --text-display-lg: clamp(2rem,   4vw,   3.5rem);
-  --text-display-md: clamp(1.5rem, 3vw,   2.5rem);
-  --text-xl:         clamp(1.25rem, 2vw,  1.75rem);
-  --text-lg:         clamp(1.0625rem, 1.5vw, 1.25rem);
-  --text-base:       1rem;
-  --text-sm:         0.875rem;
-  --text-xs:         0.75rem;
-
-  /* Spacing rhythm */
-  --section-padding-y: clamp(4rem, 8vw, 7rem);
-  --container-px:      clamp(1rem, 4vw, 3rem);
-  --container-max:     90rem;
-
-  /* Radius */
-  --radius-card:   1.25rem;
-  --radius-btn:    0.625rem;
-  --radius-input:  0.5rem;
-  --radius-pill:   9999px;
-
-  /* Elevation shadows */
-  --shadow-card:       0 4px  24px 0 rgba(26, 26, 26, 0.08);
-  --shadow-card-hover: 0 8px  40px 0 rgba(26, 26, 26, 0.14);
-  --shadow-panel:      0 16px 48px 0 rgba(26, 26, 26, 0.12);
-  --shadow-dropdown:   0 4px  16px 0 rgba(26, 26, 26, 0.10);
-
-  /* Motion timing */
-  --ease-out-expo:   cubic-bezier(0.16, 1, 0.3, 1);
-  --ease-in-out:     cubic-bezier(0.4, 0, 0.2, 1);
-  --duration-fast:   150ms;
-  --duration-base:   250ms;
-  --duration-slow:   400ms;
-  --duration-reveal: 600ms;
 }
 
-/* --------------------------------------------------------------------------
- * Base reset + normalization
- * ----------------------------------------------------------------------- */
+/* -------------------------------------------------------------------------- */
+/* 2. Base element styles                                                     */
+/* -------------------------------------------------------------------------- */
 
-@layer base {
-  *,
-  *::before,
-  *::after {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-  }
-
-  html {
-    -moz-text-size-adjust: none;
-    -webkit-text-size-adjust: none;
-    text-size-adjust: none;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    text-rendering: optimizeLegibility;
-    scroll-behavior: smooth;
-    hanging-punctuation: first last;
-    /* Reserve space for sticky navbar so anchor jumps don't clip headings */
-    scroll-padding-top: 5rem;
-  }
-
-  body {
-    min-height: 100dvh;
-    background-color: var(--color-surface-base);
-    color: var(--color-parchment);
-    font-family: var(--font-body);
-    font-size: var(--text-base);
-    line-height: 1.6;
-    overflow-x: clip;
-  }
-
-  h1, h2, h3, h4, h5, h6 {
-    font-family: var(--font-display);
-    color: var(--color-parchment);
-    text-wrap: balance;
-  }
-
-  p {
-    text-wrap: pretty;
-  }
-
-  a {
-    color: inherit;
-    text-decoration: none;
-  }
-
-  button {
-    cursor: pointer;
-    font: inherit;
-  }
-
-  img {
-    max-width: 100%;
-    height: auto;
-  }
-
-  ::selection {
-    background: rgba(174, 138, 62, 0.28);
-    color: #33231A;
-  }
-
-  :focus-visible {
-    outline: 2px solid var(--color-focus-ring);
-    outline-offset: 2px;
-    border-radius: 2px;
-  }
-
-  /* Thin light scrollbar */
-  ::-webkit-scrollbar {
-    width: 10px;
-    height: 10px;
-  }
-  ::-webkit-scrollbar-track {
-    background: var(--color-onyx);
-  }
-  ::-webkit-scrollbar-thumb {
-    background: #E9DCC3;
-    border-radius: 9999px;
-    border: 2px solid var(--color-onyx);
-  }
-  ::-webkit-scrollbar-thumb:hover {
-    background: rgba(174, 138, 62, 0.45);
-  }
+html {
+  scroll-behavior: smooth;
+  /* Prevent font-size inflation on mobile */
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 
-/* --------------------------------------------------------------------------
- * Custom utility classes — signature Noir effects
- * ----------------------------------------------------------------------- */
-
-@layer utilities {
-  /* Gold gradient display text — deeper stops keep contrast on ivory */
-  .text-gold-gradient {
-    background: linear-gradient(100deg, #8A6A28 0%, #C8A96E 38%, #AE8A3E 62%, #7A5C20 100%);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-  }
-
-  /* Film grain overlay — apply to a full-screen layer */
-  .grain-overlay {
-    pointer-events: none;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-    opacity: 0.05;
-    mix-blend-mode: overlay;
-  }
-
-  /* Glassmorphism card — frosted white on ivory */
-  .glass-card {
-    background: rgba(255, 255, 255, 0.68);
-    border: 1px solid rgba(51, 35, 26, 0.08);
-    box-shadow: 0 4px 24px rgba(51, 35, 26, 0.06);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-  }
-
-  /* Sheen sweep for primary gold buttons (uses animate-sheen keyframe) */
-  .btn-gold-sheen {
-    background-image: linear-gradient(
-      110deg,
-      #C8A96E 0%,
-      #C8A96E 42%,
-      #EFE0B8 50%,
-      #C8A96E 58%,
-      #C8A96E 100%
-    );
-    background-size: 200% auto;
-  }
-
-  /* Soft gold glow ring on hover for interactive cards */
-  .glow-hover {
-    transition: box-shadow var(--duration-base) var(--ease-out-expo),
-                border-color var(--duration-base) var(--ease-out-expo),
-                transform var(--duration-base) var(--ease-out-expo);
-  }
-  .glow-hover:hover {
-    border-color: rgba(200, 169, 110, 0.35);
-    box-shadow: 0 8px 32px -6px rgba(200, 169, 110, 0.25);
-  }
-
-  /* Hide scrollbars for marquee rows */
-  .no-scrollbar::-webkit-scrollbar {
-    display: none;
-  }
-  .no-scrollbar {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-  }
+body {
+  background-color: var(--color-onyx);
+  color: var(--color-parchment);
+  /* Improve rendering */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  overflow-x: hidden;
 }
 
-/* --------------------------------------------------------------------------
- * Reduced motion — honor OS-level preference
- * ----------------------------------------------------------------------- */
+/* Selection — gold-tinted, on-brand */
+::selection {
+  background-color: rgba(200, 169, 110, 0.35);
+  color: var(--color-parchment);
+}
+
+/* Focus visible — accessible gold ring */
+:focus-visible {
+  outline: 2px solid var(--color-gold);
+  outline-offset: 2px;
+}
+
+/* Custom scrollbar (WebKit) — thin, espresso on ivory */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-onyx-soft);
+}
+::-webkit-scrollbar-thumb {
+  background: #D9C9A8;
+  border-radius: 5px;
+  border: 2px solid var(--color-onyx-soft);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-gold);
+}
+
+/* Custom scrollbar (Firefox) */
+html {
+  scrollbar-width: thin;
+  scrollbar-color: #D9C9A8 var(--color-onyx-soft);
+}
+
+/* -------------------------------------------------------------------------- */
+/* 3. Signature utility classes                                               */
+/* -------------------------------------------------------------------------- */
+
+/* Film grain overlay — apply to a positioned wrapper, covers absolute inset */
+.grain-overlay {
+  position: absolute;
+  inset: 0;
+  background-image: var(--grain-url);
+  background-repeat: repeat;
+  opacity: 0.05;
+  pointer-events: none;
+  mix-blend-mode: overlay;
+}
+
+/* Gold gradient text — for accent words inside display headings */
+.text-gold-gradient {
+  background: linear-gradient(
+    100deg,
+    var(--color-gold-dark) 0%,
+    var(--color-gold) 40%,
+    var(--color-gold-light) 65%,
+    var(--color-gold) 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+/* Frosted glass card — light ivory glass with warm hairline */
+.glass-card {
+  background: rgba(255, 252, 246, 0.72);
+  border: 1px solid rgba(233, 220, 195, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 10px 30px rgba(51, 35, 26, 0.08);
+}
+
+/* Gold glow on hover — subtle elevation for interactive cards */
+.glow-hover {
+  transition: box-shadow 450ms var(--ease-out-expo),
+              transform 450ms var(--ease-out-expo),
+              border-color 450ms var(--ease-out-expo);
+}
+.glow-hover:hover {
+  box-shadow: 0 18px 50px rgba(51, 35, 26, 0.14),
+              0 0 0 1px rgba(200, 169, 110, 0.35);
+  transform: translateY(-3px);
+  border-color: rgba(200, 169, 110, 0.5);
+}
+
+/* Button sheen sweep — gold button with animated light streak */
+.btn-gold-sheen {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(
+    135deg,
+    var(--color-gold) 0%,
+    #C8A96E 50%,
+    var(--color-gold) 100%
+  );
+}
+.btn-gold-sheen::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 40%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.35),
+    transparent
+  );
+  transform: translateX(-150%) skewX(-12deg);
+  pointer-events: none;
+}
+.btn-gold-sheen:hover::after,
+.btn-gold-sheen.animate-sheen::after {
+  animation: sheen-sweep 2.8s var(--ease-out-expo) infinite;
+}
+@keyframes sheen-sweep {
+  0%   { transform: translateX(-150%) skewX(-12deg); }
+  55%  { transform: translateX(250%) skewX(-12deg); }
+  100% { transform: translateX(250%) skewX(-12deg); }
+}
+
+/* -------------------------------------------------------------------------- */
+/* 4. Reduced-motion guard — respect user preference globally                 */
+/* -------------------------------------------------------------------------- */
 
 @media (prefers-reduced-motion: reduce) {
   html {
@@ -267,5 +204,6 @@
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }
