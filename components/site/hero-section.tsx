@@ -1,9 +1,10 @@
 'use client'
 
 // components/site/hero-section.tsx
-// Si-Si — flagship hero, "Noir Bloom" design.
-// Signature elements: drifting aurora gradients, film grain, mouse-parallax
-// floating imagery, staggered headline reveal, sheen CTA, services marquee.
+// Si-Si — flagship hero, light festive "Bloom" design.
+// Signature elements: drifting aurora gradients (gold + blush), film grain,
+// floral line-art with confetti, mouse-parallax floating imagery, staggered
+// headline reveal, sheen CTA, services marquee.
 // All animation is opacity/transform only; honors prefers-reduced-motion.
 
 import { useCallback } from 'react'
@@ -87,6 +88,68 @@ export function HeroSection() {
         <div className="absolute left-1/3 top-1/4 h-72 w-72 rounded-full bg-brand-gold/10 blur-3xl animate-aurora" />
         <div className="absolute inset-0 bg-gradient-to-b from-brand-onyx/40 via-transparent to-brand-onyx" />
       </div>
+
+      {/* ------------------------------------------------------------ */}
+      {/* Festive floral line-art + confetti (decorative, layout-safe)  */}
+      {/* ------------------------------------------------------------ */}
+      <svg
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 h-full w-full"
+        viewBox="0 0 1440 900"
+        preserveAspectRatio="xMidYMid slice"
+        fill="none"
+      >
+        {/* Top-left sprig — stem with leaves and a blossom */}
+        <g stroke="#AE8A3E" strokeOpacity="0.38" strokeWidth="1.6" strokeLinecap="round">
+          <path d="M-24 264 C 84 214, 150 138, 176 14" />
+          <path d="M52 206 q 30 -2 44 -26 q -32 -2 -44 26 Z" />
+          <path d="M96 162 q 28 -8 38 -34 q -30 4 -38 34 Z" />
+          <path d="M132 108 q 26 -10 32 -36 q -28 6 -32 36 Z" />
+          <path d="M34 226 q -4 30 12 46 q 6 -30 -12 -46 Z" />
+        </g>
+        <g fill="#E7AAB9" fillOpacity="0.75">
+          <circle cx="182" cy="12" r="7" />
+          <circle cx="170" cy="2" r="5.5" />
+          <circle cx="194" cy="2" r="5.5" />
+        </g>
+        <circle cx="182" cy="6" r="3" fill="#AE8A3E" fillOpacity="0.8" />
+
+        {/* Bottom-right sprig — mirrored */}
+        <g stroke="#AE8A3E" strokeOpacity="0.38" strokeWidth="1.6" strokeLinecap="round">
+          <path d="M1464 640 C 1356 692, 1292 766, 1266 890" />
+          <path d="M1388 696 q -30 2 -44 26 q 32 2 44 -26 Z" />
+          <path d="M1344 740 q -28 8 -38 34 q 30 -4 38 -34 Z" />
+          <path d="M1308 794 q -26 10 -32 36 q 28 -6 32 -36 Z" />
+          <path d="M1406 676 q 4 -30 -12 -46 q -6 30 12 46 Z" />
+        </g>
+        <g fill="#E7AAB9" fillOpacity="0.75">
+          <circle cx="1260" cy="890" r="7" />
+          <circle cx="1248" cy="900" r="5.5" />
+          <circle cx="1272" cy="900" r="5.5" />
+        </g>
+        <circle cx="1260" cy="896" r="3" fill="#AE8A3E" fillOpacity="0.8" />
+
+        {/* Scattered confetti — dots and tiny diamonds */}
+        <g fill="#AE8A3E" fillOpacity="0.4">
+          <circle cx="240" cy="120" r="3.5" />
+          <circle cx="1204" cy="148" r="3" />
+          <circle cx="1120" cy="700" r="3.5" />
+          <path d="M320 640 l6 10 -6 10 -6 -10 Z" />
+          <path d="M1180 320 l5 8 -5 8 -5 -8 Z" />
+        </g>
+        <g fill="#E7AAB9" fillOpacity="0.55">
+          <circle cx="360" cy="300" r="4" />
+          <circle cx="1090" cy="220" r="4" />
+          <circle cx="420" cy="720" r="3" />
+          <path d="M1140 520 l6 10 -6 10 -6 -10 Z" />
+        </g>
+        <g fill="#2D5016" fillOpacity="0.28">
+          <circle cx="200" cy="480" r="3" />
+          <circle cx="1250" cy="470" r="3" />
+          <path d="M280 380 l5 8 -5 8 -5 -8 Z" />
+        </g>
+      </svg>
+
       <div aria-hidden="true" className="grain-overlay absolute inset-0" />
 
       {/* ---------------------------------------------------------------- */}
@@ -103,7 +166,7 @@ export function HeroSection() {
         >
           <motion.p
             variants={lineReveal}
-            className="inline-flex min-h-11 w-fit items-center gap-2.5 rounded-full border border-brand-gold/30 bg-brand-gold/[0.07] px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.24em] text-brand-gold"
+            className="inline-flex min-h-11 w-fit items-center gap-2.5 rounded-full border border-brand-gold/30 bg-brand-gold/[0.07] px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.24em] text-brand-gold-dark"
           >
             <span className="h-1.5 w-1.5 rounded-full bg-brand-gold animate-pulse-dot" />
             {locale === 'en'
