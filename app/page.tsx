@@ -231,7 +231,7 @@ export default function HomePage() {
           <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             {/* Section heading */}
             <div className="mx-auto mb-14 max-w-2xl text-center">
-              <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.24em] text-brand-gold">
+              <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.24em] text-brand-gold-dark">
                 Калькулятор
               </p>
               <h2
