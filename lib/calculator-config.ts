@@ -146,9 +146,21 @@ export function computeCartTotals(
     0,
   )
 
+  // Total is the sum of per-item subtotals WITH markup.
+  // Each item carries its own subtotalWithMarkup, so categories with
+  // custom pricing (e.g. bouquet with a client-entered amount, no markup)
+  // are summed at face value while others keep their marked-up subtotal.
+  const totalWithMarkup = items.reduce(
+    (sum, item) =>
+      sum +
+      (item.subtotalWithMarkup ??
+        applyMarkup(item.subtotalBeforeMarkup ?? item.basePrice ?? 0, markupCoefficient)),
+    0,
+  )
+
   return {
     totalBeforeMarkup,
-    totalWithMarkup: applyMarkup(totalBeforeMarkup, markupCoefficient),
+    totalWithMarkup,
   }
 }
 

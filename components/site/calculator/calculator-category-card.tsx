@@ -20,6 +20,7 @@ import {
   type CategoryField,
   type SelectOption,
   type CategorySelection,
+  type CartItem,
 } from '@/lib/calculator-config'
 import {
   useCalculatorCart,
@@ -322,6 +323,45 @@ export function CalculatorCategoryCard({
     setIsCalculated(false)
   }, [])
 
+  // -------------------------------------------------------------------------
+  // Bouquet — free-form amount, NO markup.
+  // The client enters the budget themselves; the cart item is stored at face
+  // value (subtotalWithMarkup === subtotalBeforeMarkup === amount).
+  // -------------------------------------------------------------------------
+  const isCustomBouquet = categoryId === 'bouquet'
+  const BOUQUET_MIN = 15_000
+  const BOUQUET_PRESETS = [15_000, 25_000, 35_000, 50_000]
+  const [customAmount, setCustomAmount] = useState<number>(BOUQUET_MIN)
+
+  const fmtAmount = (n: number) => n.toLocaleString('ru-RU') + ' ₽'
+
+  const handleBouquetCalculate = useCallback(() => {
+    const amount = Math.max(BOUQUET_MIN, Math.round(customAmount) || BOUQUET_MIN)
+
+    const item: CartItem = {
+      id: `category-${categoryId}`,
+      categoryId,
+      categoryLabelRu: config.labelRu,
+      selections: [
+        {
+          fieldId: 'customAmount',
+          labelRu: 'Сумма букета',
+          labelEn: 'Bouquet budget',
+          selectedValue: amount,
+          selectedLabelRu: fmtAmount(amount),
+          selectedLabelEn: fmtAmount(amount),
+        },
+      ],
+      subtotalBeforeMarkup: amount,
+      subtotalWithMarkup: amount,
+    }
+
+    upsertItem(item)
+    setIsCalculated(true)
+    onCalculated?.()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [categoryId, config, customAmount, upsertItem, onCalculated])
+
   const fieldLabel = (field: CategoryField): string =>
     locale === 'en' ? field.labelEn : field.labelRu
 
@@ -419,7 +459,60 @@ export function CalculatorCategoryCard({
         <p className="mt-1 text-sm text-brand-stone">{description}</p>
       </div>
 
-      {/* Dynamic fields */}
+      {/* Bouquet: free-form amount input (no markup) */}
+      {isCustomBouquet ? (
+        <div className="space-y-5">
+          <div className="flex flex-col gap-2">
+            <label
+              htmlFor={`${categoryId}-custom-amount`}
+              className="text-sm font-medium text-brand-parchment/85"
+            >
+              {locale === 'en' ? 'Your bouquet budget, ₽' : 'Ваша сумма на букет, ₽'}
+            </label>
+            <input
+              id={`${categoryId}-custom-amount`}
+              type="number"
+              inputMode="numeric"
+              min={BOUQUET_MIN}
+              step={500}
+              value={customAmount}
+              onChange={(e) => setCustomAmount(Number(e.target.value))}
+              className="
+                w-full rounded-xl border border-brand-midnight-border
+                bg-brand-midnight-soft px-4 py-3 text-sm text-brand-parchment
+                transition-colors duration-base
+                focus:border-brand-gold/60 focus:outline-none focus:ring-2 focus:ring-brand-gold/25
+              "
+            />
+          </div>
+
+          {/* Quick presets */}
+          <div className="flex flex-wrap gap-2">
+            {BOUQUET_PRESETS.map((preset) => (
+              <button
+                key={preset}
+                type="button"
+                onClick={() => setCustomAmount(preset)}
+                className={[
+                  'rounded-full border px-4 py-1.5 text-xs font-semibold transition-colors duration-base',
+                  customAmount === preset
+                    ? 'border-brand-gold bg-brand-gold/15 text-brand-gold'
+                    : 'border-brand-midnight-border bg-brand-midnight-soft/60 text-brand-stone hover:border-brand-gold/50 hover:text-brand-parchment',
+                ].join(' ')}
+              >
+                {fmtAmount(preset)}
+              </button>
+            ))}
+          </div>
+
+          <div className="rounded-xl border border-brand-gold/30 bg-brand-gold/[0.07] px-4 py-3 text-xs leading-relaxed text-brand-gold-light">
+            {locale === 'en'
+              ? '💐 Final price — no markup. Our florist will craft the bouquet to fit your budget and confirm the details by phone.'
+              : '💐 Финальная цена — без наценки. Флорист соберёт букет под ваш бюджет и уточнит детали по телефону.'}
+          </div>
+        </div>
+      ) : (
+      /* Dynamic fields */
       <div className="space-y-5">
         {config.fields.map((field) => {
           const currentValue = selections[field.id]
@@ -504,6 +597,7 @@ export function CalculatorCategoryCard({
           return null
         })}
       </div>
+      )}
 
       {/* Urgency notice */}
       {isUrgent && (
@@ -529,7 +623,7 @@ export function CalculatorCategoryCard({
       {/* Calculate CTA */}
       <button
         type="button"
-        onClick={handleCalculate}
+        onClick={isCustomBouquet ? handleBouquetCalculate : handleCalculate}
         className="btn-gold-sheen animate-sheen mt-6 inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-btn px-6 py-3 text-sm font-semibold text-brand-ink transition-transform duration-base hover:-translate-y-0.5"
       >
         {alreadyInCart

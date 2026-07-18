@@ -19,7 +19,7 @@
  * ----------------------------------------------------------------------- */
 
 :root {
-  color-scheme: dark;
+  color-scheme: light;
 
   /* Brand palette — keep in sync with tailwind.config.ts */
   --color-cream:        #FAF8F5;
@@ -37,24 +37,24 @@
   --color-ink-hairline: rgba(26, 26, 26, 0.10);
   --color-white:        #FFFFFF;
 
-  /* Dark premium palette */
-  --color-onyx:          #0B0A08;
-  --color-onyx-soft:     #100E0C;
-  --color-midnight:      #141414;
-  --color-midnight-soft: #1B1A18;
-  --color-midnight-card: #211F1C;
-  --color-wine:          #2A1418;
-  --color-parchment:     #E9E1D4;
-  --color-stone:         #B3AAA0;
-  --color-stone-soft:    #8E867D;
+  /* Festive light palette (token values mirror tailwind.config.ts) */
+  --color-onyx:          #FBF6EC;
+  --color-onyx-soft:     #F5EDDC;
+  --color-midnight:      #FFFCF6;
+  --color-midnight-soft: #FFFFFF;
+  --color-midnight-card: #FFFFFF;
+  --color-wine:          #E7AAB9;
+  --color-parchment:     #33231A;
+  --color-stone:         #8A7663;
+  --color-stone-soft:    #A8978A;
 
-  /* Semantic surface layers (dark) */
+  /* Semantic surface layers (light) */
   --color-surface-base:   var(--color-onyx);
   --color-surface-card:   var(--color-midnight-card);
   --color-surface-offset: var(--color-onyx-soft);
   --color-surface-dark:   var(--color-midnight);
-  --color-border:         rgba(233, 225, 212, 0.10);
-  --color-border-strong:  rgba(233, 225, 212, 0.18);
+  --color-border:         rgba(51, 35, 26, 0.10);
+  --color-border-strong:  rgba(51, 35, 26, 0.18);
 
   /* Focus ring */
   --color-focus-ring: var(--color-gold);
@@ -161,8 +161,8 @@
   }
 
   ::selection {
-    background: rgba(200, 169, 110, 0.35);
-    color: #fff;
+    background: rgba(174, 138, 62, 0.28);
+    color: #33231A;
   }
 
   :focus-visible {
@@ -171,7 +171,7 @@
     border-radius: 2px;
   }
 
-  /* Thin dark scrollbar */
+  /* Thin light scrollbar */
   ::-webkit-scrollbar {
     width: 10px;
     height: 10px;
@@ -180,12 +180,12 @@
     background: var(--color-onyx);
   }
   ::-webkit-scrollbar-thumb {
-    background: var(--color-midnight-border, #2D2A26);
+    background: #E9DCC3;
     border-radius: 9999px;
     border: 2px solid var(--color-onyx);
   }
   ::-webkit-scrollbar-thumb:hover {
-    background: rgba(200, 169, 110, 0.45);
+    background: rgba(174, 138, 62, 0.45);
   }
 }
 
@@ -194,9 +194,9 @@
  * ----------------------------------------------------------------------- */
 
 @layer utilities {
-  /* Gold gradient display text */
+  /* Gold gradient display text — deeper stops keep contrast on ivory */
   .text-gold-gradient {
-    background: linear-gradient(100deg, #A8863E 0%, #E9D5A8 38%, #C8A96E 62%, #8f6f33 100%);
+    background: linear-gradient(100deg, #8A6A28 0%, #C8A96E 38%, #AE8A3E 62%, #7A5C20 100%);
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
@@ -210,10 +210,11 @@
     mix-blend-mode: overlay;
   }
 
-  /* Glassmorphism card */
+  /* Glassmorphism card — frosted white on ivory */
   .glass-card {
-    background: rgba(233, 225, 212, 0.03);
-    border: 1px solid rgba(233, 225, 212, 0.08);
+    background: rgba(255, 255, 255, 0.68);
+    border: 1px solid rgba(51, 35, 26, 0.08);
+    box-shadow: 0 4px 24px rgba(51, 35, 26, 0.06);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
   }
