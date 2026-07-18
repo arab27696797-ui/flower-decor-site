@@ -49,7 +49,7 @@ function EstimateMiniSummary({ cart, locale }: EstimateMiniSummaryProps) {
 
   return (
     <div className="rounded-card border border-brand-gold/25 bg-brand-midnight-soft p-4 sm:p-5">
-      <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-gold">
+      <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-gold-dark">
         {locale === 'en' ? 'Attached estimate' : 'Прикреплённая смета'}
       </p>
 
@@ -106,7 +106,7 @@ function FieldError({ messageKey, locale }: FieldErrorProps) {
   const text = entry ? (locale === 'en' ? entry.en : entry.ru) : messageKey
 
   return (
-    <p role="alert" className="mt-1 text-xs leading-snug text-red-300">
+    <p role="alert" className="mt-1 text-xs leading-snug text-red-600">
       {text}
     </p>
   )
@@ -228,12 +228,12 @@ export function LeadForm({
           whileInView={sectionAnimation.whileInView}
           viewport={{ once: true, amount: 0.2 }}
           transition={sectionAnimation.transition}
-          className="mx-auto max-w-5xl rounded-[28px] border border-green-500/20 bg-green-500/10 p-8 text-center shadow-dark-card"
+          className="mx-auto max-w-5xl rounded-[28px] border border-green-600/25 bg-green-500/10 p-8 text-center shadow-dark-card"
         >
-          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-green-500/15">
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-green-600/15">
             <svg
               viewBox="0 0 24 24"
-              className="h-7 w-7 text-green-300"
+              className="h-7 w-7 text-green-700"
               fill="none"
               stroke="currentColor"
               strokeWidth={2.5}
@@ -272,7 +272,7 @@ export function LeadForm({
         className="mx-auto max-w-5xl"
       >
         <div className="max-w-2xl">
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-brand-gold">
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-brand-gold-dark">
             Si-Si
           </p>
           <h2 className="mt-3 font-display text-display-md text-brand-parchment">
@@ -460,7 +460,7 @@ export function LeadForm({
             {submitStatus === 'error' && (
               <div
                 role="alert"
-                className="rounded-card border border-red-400/30 bg-red-500/10 px-4 py-3 text-sm text-red-200"
+                className="rounded-card border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-700"
               >
                 {locale === 'en'
                   ? 'Could not send the request. Please try again or contact us directly.'
