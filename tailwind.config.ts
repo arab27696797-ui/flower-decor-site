@@ -1,169 +1,118 @@
+// tailwind.config.ts
+// Si-Si — Tailwind design tokens.
+// Brand palette: ivory/cream base, gold accents, blush pink (wine) touches,
+// deep green (moss) secondary accents — light festive theme.
+
 import type { Config } from 'tailwindcss'
 
 const config: Config = {
   content: [
-    './app/**/*.{js,ts,jsx,tsx,mdx}',
-    './components/**/*.{js,ts,jsx,tsx,mdx}',
-    './lib/**/*.{js,ts,jsx,tsx}',
-    './pages/**/*.{js,ts,jsx,tsx,mdx}',
+    './app/**/*.{ts,tsx}',
+    './components/**/*.{ts,tsx}',
+    './lib/**/*.{ts,tsx}',
   ],
-
-  darkMode: 'class',
-
   theme: {
     extend: {
       colors: {
         brand: {
-          cream: '#FAF8F5',
-          forest: '#2D5016',
-          'forest-dark': '#1E3610',
-          'forest-light': '#3D6B20',
-          gold: '#AE8A3E',
-          'gold-light': '#C8A96E',
-          'gold-dark': '#8A6A28',
-          blush: '#E8C5C5',
-          'blush-light': '#F2DADA',
-          ink: '#33231A',
-          surface: '#FFFFFF',
-          offset: '#F2EFE9',
+          // Base surfaces — light festive scale (kept token names for compatibility)
+          onyx:             '#FBF6EC',  // warm ivory — section base
+          'onyx-soft':      '#F7EEDC',  // slightly deeper ivory — alt sections
+          midnight:         '#FFFCF6',  // near-white — cards / forms base
+          'midnight-soft':  '#FFF9EE',  // soft white — inputs
+          'midnight-card':  '#FFFDF9',  // card surface
+          'midnight-border':'#E9DCC3',  // warm hairline border
 
-          // Dark premium theme — "Si-Si Noir"
-          onyx: '#FBF6EC',
-          'onyx-soft': '#F5EDDC',
-          midnight: '#FFFCF6',
-          'midnight-soft': '#FFFFFF',
-          'midnight-card': '#FFFFFF',
-          'midnight-border': '#E9DCC3',
-          wine: '#E7AAB9',
-          'wine-soft': '#F3CBD5',
-          parchment: '#33231A',
-          stone: '#8A7663',
-          'stone-soft': '#A8978A',
+          // Text colors (dark on light)
+          parchment: '#33231A',         // deep espresso — primary text
+          stone:     '#8A7663',         // warm taupe — secondary text
+          'stone-soft': '#83705D',      // taupe with AA contrast on white — placeholders / small text
+
+          // Accents
+          gold:        '#AE8A3E',       // main gold (festive, readable on white)
+          'gold-light':'#C8A96E',       // lighter gold for gradients/hover
+          'gold-dark': '#8A6A28',       // deeper gold for small labels / links
+          wine:        '#E7AAB9',       // blush pink — festive accents, glows
+          'wine-dark': '#C97F95',       // deeper blush
+          moss:        '#2D5016',       // deep leaf green — eco accents
+          'moss-soft': '#5E7B4A',       // lighter green
+          ink:         '#33231A',       // button text on gold
         },
       },
-
       fontFamily: {
-        display: ['var(--font-cormorant)', 'Georgia', '"Times New Roman"', 'serif'],
-        sans: ['var(--font-inter)', 'system-ui', '-apple-system', 'sans-serif'],
+        display: ['var(--font-display)', 'Georgia', 'serif'],
+        body:    ['var(--font-body)', 'system-ui', 'sans-serif'],
       },
-
       fontSize: {
-        'display-xl': ['clamp(2.5rem, 6vw, 5rem)', { lineHeight: '1.1', letterSpacing: '-0.02em' }],
-        'display-lg': ['clamp(2rem, 4vw, 3.5rem)', { lineHeight: '1.15', letterSpacing: '-0.015em' }],
-        'display-md': ['clamp(1.5rem, 3vw, 2.5rem)', { lineHeight: '1.2', letterSpacing: '-0.01em' }],
+        'display-xl': ['clamp(2.6rem, 6.2vw, 4.6rem)', { lineHeight: '1.05', letterSpacing: '-0.02em' }],
+        'display-lg': ['clamp(2.1rem, 4.6vw, 3.4rem)', { lineHeight: '1.1',  letterSpacing: '-0.015em' }],
+        'display-md': ['clamp(1.7rem, 3.4vw, 2.5rem)', { lineHeight: '1.15', letterSpacing: '-0.01em' }],
       },
-
-      spacing: {
-        section: '6rem',
-        container: '90rem',
-      },
-
       borderRadius: {
-        card: '1.25rem',
-        btn: '0.625rem',
-        xl: '1rem',
+        card: '18px',
+        btn:  '9999px',
       },
-
       boxShadow: {
-        card: '0 4px 24px 0 rgba(26, 26, 26, 0.08)',
-        'card-hover': '0 8px 40px 0 rgba(26, 26, 26, 0.14)',
-        panel: '0 16px 48px 0 rgba(26, 26, 26, 0.12)',
-        dropdown: '0 4px 16px 0 rgba(26, 26, 26, 0.10)',
-        'dark-card': '0 10px 30px 0 rgba(0, 0, 0, 0.28)',
-        'dark-hover': '0 18px 50px 0 rgba(0, 0, 0, 0.34)',
-        'gold-glow': '0 8px 32px -6px rgba(200, 169, 110, 0.45)',
+        // Warm, soft shadows tuned for the light theme (espresso-tinted)
+        'dark-card':  '0 10px 30px 0 rgba(51, 35, 26, 0.10)',
+        'dark-hover': '0 18px 50px 0 rgba(51, 35, 26, 0.15)',
+        'gold-glow':  '0 6px 24px 0 rgba(174, 138, 62, 0.35)',
+        card:         '0 10px 30px 0 rgba(51, 35, 26, 0.10)',
       },
-
-      maxWidth: {
-        prose: '68ch',
-        container: '90rem',
-      },
-
-      transitionTimingFunction: {
-        'out-expo': 'cubic-bezier(0.16, 1, 0.3, 1)',
-        'in-out-sm': 'cubic-bezier(0.4, 0, 0.2, 1)',
-      },
-
       transitionDuration: {
         fast: '150ms',
         base: '250ms',
-        slow: '400ms',
-        reveal: '600ms',
+        slow: '450ms',
       },
-
+      transitionTimingFunction: {
+        'ease-out-expo': 'cubic-bezier(0.16, 1, 0.3, 1)',
+      },
       keyframes: {
-        'slide-up-fade': {
-          from: { opacity: '0', transform: 'translateY(1rem)' },
-          to: { opacity: '1', transform: 'translateY(0)' },
+        'fade-up': {
+          from: { opacity: '0', transform: 'translateY(24px)' },
+          to:   { opacity: '1', transform: 'translateY(0)' },
         },
         'fade-in': {
           from: { opacity: '0' },
-          to: { opacity: '1' },
+          to:   { opacity: '1' },
         },
-        'scale-in': {
-          from: { opacity: '0', transform: 'scale(0.97)' },
-          to: { opacity: '1', transform: 'scale(1)' },
-        },
-        // Infinite horizontal marquee — translate -50% because content is duplicated
         marquee: {
           from: { transform: 'translateX(0)' },
-          to: { transform: 'translateX(-50%)' },
+          to:   { transform: 'translateX(-50%)' },
         },
-        // Slow drifting aurora blobs — transform only, GPU-friendly
-        'aurora-drift': {
-          '0%, 100%': { transform: 'translate(0, 0) scale(1)' },
-          '33%': { transform: 'translate(4%, -6%) scale(1.08)' },
-          '66%': { transform: 'translate(-5%, 4%) scale(0.95)' },
-        },
-        'aurora-drift-alt': {
-          '0%, 100%': { transform: 'translate(0, 0) scale(1)' },
-          '50%': { transform: 'translate(-6%, -4%) scale(1.1)' },
-        },
-        // Gentle vertical float for hero imagery
         float: {
-          '0%, 100%': { transform: 'translateY(0)' },
-          '50%': { transform: 'translateY(-14px)' },
+          '0%, 100%': { transform: 'translateY(0px)' },
+          '50%':      { transform: 'translateY(-12px)' },
         },
-        // Moving sheen across gold buttons
+        aurora: {
+          '0%, 100%': { transform: 'translate(0, 0) scale(1)' },
+          '33%':      { transform: 'translate(4%, -3%) scale(1.06)' },
+          '66%':      { transform: 'translate(-3%, 4%) scale(0.97)' },
+        },
         sheen: {
-          from: { backgroundPosition: '200% center' },
-          to: { backgroundPosition: '-200% center' },
+          from: { transform: 'translateX(-150%) skewX(-12deg)' },
+          to:   { transform: 'translateX(250%) skewX(-12deg)' },
         },
         'pulse-dot': {
-          '0%, 100%': { opacity: '1', transform: 'scale(1)' },
-          '50%': { opacity: '0.45', transform: 'scale(0.8)' },
+          '0%, 100%': { opacity: '1' },
+          '50%':      { opacity: '0.35' },
         },
       },
-
       animation: {
-        'slide-up': 'slide-up-fade 400ms cubic-bezier(0.16, 1, 0.3, 1) both',
-        'fade-in': 'fade-in 300ms cubic-bezier(0.16, 1, 0.3, 1) both',
-        'scale-in': 'scale-in 250ms cubic-bezier(0.16, 1, 0.3, 1) both',
-        marquee: 'marquee 36s linear infinite',
+        'fade-up':      'fade-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) both',
+        'fade-in':      'fade-in 0.6s ease-out both',
+        marquee:        'marquee 32s linear infinite',
         'marquee-slow': 'marquee 55s linear infinite',
         'marquee-reverse': 'marquee 55s linear infinite reverse',
-        aurora: 'aurora-drift 18s ease-in-out infinite',
-        'aurora-alt': 'aurora-drift-alt 22s ease-in-out infinite',
-        float: 'float 7s ease-in-out infinite',
-        'float-slow': 'float 10s ease-in-out infinite',
-        sheen: 'sheen 5s linear infinite',
-        'pulse-dot': 'pulse-dot 2.2s ease-in-out infinite',
-      },
-
-      backdropBlur: {
-        nav: '12px',
-      },
-
-      zIndex: {
-        navbar: '50',
-        dropdown: '60',
-        overlay: '70',
-        modal: '80',
-        cookie: '90',
+        float:          'float 7s ease-in-out infinite',
+        'float-slow':   'float 10s ease-in-out infinite',
+        aurora:         'aurora 16s ease-in-out infinite',
+        'aurora-alt':   'aurora 20s ease-in-out infinite reverse',
+        sheen:          'sheen 2.8s ease-in-out infinite',
+        'pulse-dot':    'pulse-dot 2.4s ease-in-out infinite',
       },
     },
   },
-
   plugins: [],
 }
 
