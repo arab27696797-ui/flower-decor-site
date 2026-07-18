@@ -120,7 +120,7 @@ export function Footer() {
 
           {/* Navigation */}
           <nav aria-label={locale === 'en' ? 'Footer navigation' : 'Навигация в подвале'}>
-            <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.22em] text-brand-gold">
+            <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.22em] text-brand-gold-dark">
               {locale === 'en' ? 'Navigate' : 'Навигация'}
             </p>
             <ul className="space-y-2.5">
@@ -139,7 +139,7 @@ export function Footer() {
 
           {/* Contacts */}
           <div>
-            <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.22em] text-brand-gold">
+            <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.22em] text-brand-gold-dark">
               {locale === 'en' ? 'Contacts' : 'Контакты'}
             </p>
             <ul className="space-y-2.5 text-sm">
