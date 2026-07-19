@@ -239,7 +239,7 @@ export function HeroSection() {
             <a
               href="#calculator"
               className="
-                btn-gold-sheen animate-sheen
+                btn-gold-sheen sheen-always
                 inline-flex min-h-12 items-center justify-center gap-2
                 rounded-card px-7 py-3.5
                 text-sm font-semibold text-brand-onyx
