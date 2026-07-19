@@ -2,6 +2,8 @@
 // Si-Si — Tailwind design tokens.
 // Brand palette: ivory/cream base, gold accents, blush pink (wine) touches,
 // deep green (moss) secondary accents — light festive theme.
+// Extended with soft pastel "celebration" hues (lilac, peach, sky, mint) —
+// additive only, all legacy brand tokens are preserved unchanged.
 
 import type { Config } from 'tailwindcss'
 
@@ -37,6 +39,14 @@ const config: Config = {
           moss:        '#2D5016',       // deep leaf green — eco accents
           'moss-soft': '#5E7B4A',       // lighter green
           ink:         '#33231A',       // button text on gold
+
+          // Celebration pastels — soft rainbow hues for festive glows.
+          // Additive extension: used only in decorative aurora/glow layers,
+          // never for text, so WCAG contrast is unaffected.
+          lilac:       '#B9A8E4',       // soft lavender — celebration glow
+          peach:       '#F3C9A4',       // warm apricot — celebration glow
+          sky:         '#AACBEA',       // powder blue — celebration glow
+          mint:        '#B2D9C0',       // soft mint — celebration glow
         },
       },
       fontFamily: {
