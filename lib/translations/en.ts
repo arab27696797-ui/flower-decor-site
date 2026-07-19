@@ -95,18 +95,6 @@ export const en = {
       location: 'Moscow & surroundings',
     },
 
-    card: {
-      eyebrow: 'Indicative pricing',
-      body: {
-        before: 'With a base budget of',
-        middle: 'for fresh florals and our full-service fee of',
-        after:  'the estimated total comes to approximately',
-      },
-      disclaimer:
-        'Approximate only. Final price depends on measurements, composition, ' +
-        'materials, delivery, and urgency.',
-    },
-
     imageAlt:   'Wedding floral decoration — fresh flowers, arches and hall styling by Si-Si',
     photoLabel: 'From our portfolio',
   },
