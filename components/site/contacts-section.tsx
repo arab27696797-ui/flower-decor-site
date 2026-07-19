@@ -261,7 +261,7 @@ export function ContactsSection() {
         >
           <a
             href="#contact"
-            className="btn-gold-sheen animate-sheen inline-flex min-h-11 items-center gap-2 rounded-btn px-7 py-3 text-sm font-semibold text-brand-ink shadow-gold-glow transition-transform duration-base hover:-translate-y-0.5"
+            className="btn-gold-sheen sheen-always inline-flex min-h-11 items-center gap-2 rounded-btn px-7 py-3 text-sm font-semibold text-brand-ink shadow-gold-glow transition-transform duration-base hover:-translate-y-0.5"
           >
             {locale === 'en' ? 'Leave a request' : 'Оставить заявку'}
           </a>
