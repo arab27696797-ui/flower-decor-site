@@ -7,6 +7,7 @@
 
 import { motion, useReducedMotion } from 'framer-motion'
 import { useTranslations } from '@/lib/i18n'
+import { FestiveDecor } from '@/components/site/festive-decor'
 
 // ---------------------------------------------------------------------------
 // Service definitions — icons are decorative inline SVGs (stroke, 1.6px)
@@ -167,6 +168,9 @@ export function ServicesSection() {
         aria-hidden="true"
         className="pointer-events-none absolute right-[-12%] top-[-10%] h-[30rem] w-[30rem] rounded-full bg-brand-wine/30 blur-3xl"
       />
+
+      {/* Floating flowers and balloons */}
+      <FestiveDecor />
 
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Heading */}

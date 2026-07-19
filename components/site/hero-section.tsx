@@ -16,6 +16,7 @@ import {
   useTransform,
 } from 'framer-motion'
 import { useTranslations } from '@/lib/i18n'
+import { FestiveDecor } from '@/components/site/festive-decor'
 
 const HERO_MAIN =
   'https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=900&q=80&auto=format&fit=crop'
@@ -149,6 +150,9 @@ export function HeroSection() {
           <path d="M280 380 l5 8 -5 8 -5 -8 Z" />
         </g>
       </svg>
+
+      {/* Floating flowers and balloons — the festive signature layer */}
+      <FestiveDecor variant="hero" />
 
       <div aria-hidden="true" className="grain-overlay absolute inset-0" />
 

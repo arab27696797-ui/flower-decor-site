@@ -6,6 +6,7 @@
 
 import { motion } from 'framer-motion'
 import { useTranslations } from '@/lib/i18n'
+import { FestiveDecor } from '@/components/site/festive-decor'
 
 // ---------------------------------------------------------------------------
 // Contact constants — real business contacts
@@ -106,6 +107,9 @@ export function ContactsSection() {
         aria-hidden="true"
         className="pointer-events-none absolute right-[-10%] top-0 h-[24rem] w-[24rem] rounded-full bg-brand-gold/[0.06] blur-3xl"
       />
+
+      {/* Floating flowers and balloons */}
+      <FestiveDecor />
 
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Heading */}

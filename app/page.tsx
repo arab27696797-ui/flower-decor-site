@@ -39,6 +39,7 @@ import { LeadFormWithCart }  from '@/components/site/lead-form-with-cart'
 import { ContactsSection }   from '@/components/site/contacts-section'
 import { Footer }            from '@/components/site/footer'
 import { CookieBanner }      from '@/components/site/cookie-banner'
+import { FestiveDecor }      from '@/components/site/festive-decor'
 
 // ---------------------------------------------------------------------------
 // Accepted calculator components
@@ -227,6 +228,9 @@ export default function HomePage() {
             aria-hidden="true"
             className="pointer-events-none absolute left-[-10%] top-24 h-[26rem] w-[26rem] rounded-full bg-brand-wine/40 blur-3xl"
           />
+
+          {/* Floating flowers and balloons */}
+          <FestiveDecor />
 
           <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             {/* Section heading */}

@@ -8,6 +8,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { motion, useInView, useReducedMotion } from 'framer-motion'
 import { useTranslations } from '@/lib/i18n'
+import { FestiveDecor } from '@/components/site/festive-decor'
 
 // ---------------------------------------------------------------------------
 // CountUp — animates an integer from 0 to `target` once, when scrolled into
@@ -183,6 +184,9 @@ export function AdvantagesSection() {
         aria-hidden="true"
         className="pointer-events-none absolute left-1/2 top-16 h-72 w-[42rem] max-w-full -translate-x-1/2 rounded-full bg-brand-gold/[0.07] blur-3xl"
       />
+
+      {/* Floating flowers and balloons */}
+      <FestiveDecor />
 
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Stats band */}
