@@ -99,10 +99,11 @@ const config: Config = {
           '33%':      { transform: 'translate(4%, -3%) scale(1.06)' },
           '66%':      { transform: 'translate(-3%, 4%) scale(0.97)' },
         },
-        sheen: {
-          from: { transform: 'translateX(-150%) skewX(-12deg)' },
-          to:   { transform: 'translateX(250%) skewX(-12deg)' },
-        },
+        // NOTE: no `sheen` keyframes here on purpose — the gold-button streak
+        // lives in globals.css (@keyframes sheen-sweep) and animates only the
+        // ::after pseudo-element. A Tailwind `sheen` animation utility applied
+        // to the button element itself made the whole button slide across the
+        // screen; do not reintroduce it.
         'pulse-dot': {
           '0%, 100%': { opacity: '1' },
           '50%':      { opacity: '0.35' },
@@ -118,7 +119,6 @@ const config: Config = {
         'float-slow':   'float 10s ease-in-out infinite',
         aurora:         'aurora 16s ease-in-out infinite',
         'aurora-alt':   'aurora 20s ease-in-out infinite reverse',
-        sheen:          'sheen 2.8s ease-in-out infinite',
         'pulse-dot':    'pulse-dot 2.4s ease-in-out infinite',
       },
     },

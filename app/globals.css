@@ -162,7 +162,9 @@ html {
   border-color: rgba(200, 169, 110, 0.5);
 }
 
-/* Button sheen sweep — gold button with animated light streak */
+/* Button sheen sweep — gold button with animated light streak.
+   The streak is the ::after pseudo-element only; the button itself
+   must never be transformed (see note below). */
 .btn-gold-sheen {
   position: relative;
   overflow: hidden;
@@ -189,8 +191,14 @@ html {
   transform: translateX(-150%) skewX(-12deg);
   pointer-events: none;
 }
+/* Sheen trigger: on hover, or permanently when the element carries the
+   plain marker class `sheen-always`.
+   NOTE: `sheen-always` is an inert marker — it must NOT be a Tailwind
+   animation utility. (Previously `animate-sheen` was used here, but the
+   `sheen` keyframes translateX(-150% → 250%) applied to the BUTTON ITSELF
+   and made the whole button slide across the screen in a loop.) */
 .btn-gold-sheen:hover::after,
-.btn-gold-sheen.animate-sheen::after {
+.btn-gold-sheen.sheen-always::after {
   animation: sheen-sweep 2.8s var(--ease-out-expo) infinite;
 }
 @keyframes sheen-sweep {
