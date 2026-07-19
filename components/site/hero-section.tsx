@@ -82,11 +82,19 @@ export function HeroSection() {
     >
       {/* ---------------------------------------------------------------- */}
       {/* Aurora background + grain                                         */}
+      {/* Soft pastel "celebration rainbow": gold + blush base extended    */}
+      {/* with lavender, powder blue and mint glows — premium, low-alpha,  */}
+      {/* transform-only animation, no layout cost.                        */}
       {/* ---------------------------------------------------------------- */}
       <div aria-hidden="true" className="pointer-events-none absolute inset-0">
         <div className="absolute -top-32 right-[-10%] h-[34rem] w-[34rem] rounded-full bg-brand-gold/15 blur-3xl animate-aurora" />
         <div className="absolute bottom-[-20%] left-[-12%] h-[38rem] w-[38rem] rounded-full bg-brand-wine/60 blur-3xl animate-aurora-alt" />
         <div className="absolute left-1/3 top-1/4 h-72 w-72 rounded-full bg-brand-gold/10 blur-3xl animate-aurora" />
+        {/* Celebration rainbow accents — additive pastel glows */}
+        <div className="absolute right-[6%] top-[38%] h-80 w-80 rounded-full bg-brand-lilac/30 blur-3xl animate-aurora-alt" />
+        <div className="absolute left-[4%] top-[6%] h-72 w-72 rounded-full bg-brand-sky/25 blur-3xl animate-aurora" />
+        <div className="absolute bottom-[10%] right-[26%] h-64 w-64 rounded-full bg-brand-mint/25 blur-3xl animate-aurora" />
+        <div className="absolute left-[38%] top-[62%] h-56 w-56 rounded-full bg-brand-peach/25 blur-3xl animate-aurora-alt" />
         <div className="absolute inset-0 bg-gradient-to-b from-brand-onyx/40 via-transparent to-brand-onyx" />
       </div>
 
@@ -148,6 +156,23 @@ export function HeroSection() {
           <circle cx="200" cy="480" r="3" />
           <circle cx="1250" cy="470" r="3" />
           <path d="M280 380 l5 8 -5 8 -5 -8 Z" />
+        </g>
+        {/* Celebration confetti — pastel rainbow sparks (decorative) */}
+        <g fill="#B9A8E4" fillOpacity="0.5">
+          <circle cx="540" cy="150" r="3.5" />
+          <path d="M980 590 l5 8 -5 8 -5 -8 Z" />
+        </g>
+        <g fill="#AACBEA" fillOpacity="0.5">
+          <circle cx="700" cy="760" r="3.5" />
+          <path d="M460 200 l5 8 -5 8 -5 -8 Z" />
+        </g>
+        <g fill="#F3C9A4" fillOpacity="0.55">
+          <circle cx="880" cy="180" r="3.5" />
+          <path d="M620 560 l5 8 -5 8 -5 -8 Z" />
+        </g>
+        <g fill="#B2D9C0" fillOpacity="0.5">
+          <circle cx="1020" cy="420" r="3.5" />
+          <path d="M240 560 l5 8 -5 8 -5 -8 Z" />
         </g>
       </svg>
 
