@@ -54,6 +54,8 @@ import { CalculatorSummary }          from '@/components/site/calculator/calcula
 // SEO Metadata — App Router export
 // ---------------------------------------------------------------------------
 
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://si-si.ru'
+
 export const metadata: Metadata = {
   title: 'Si-Si — Оформление мероприятий в Москве за 24 часа',
   description:
@@ -72,23 +74,32 @@ export const metadata: Metadata = {
     'декор за 24 часа',
   ],
   alternates: {
-    canonical: process.env.NEXT_PUBLIC_SITE_URL ?? 'https://si-si.ru',
+    canonical: siteUrl,
   },
   openGraph: {
     title: 'Si-Si — Оформление мероприятий в Москве за 24 часа',
     description:
       'Флористическое оформление входных групп, свадеб, корпоративов в Москве и МО. ' +
       'Под ключ: идея, декор, доставка, монтаж и демонтаж.',
-    url: process.env.NEXT_PUBLIC_SITE_URL ?? 'https://si-si.ru',
+    url: siteUrl,
     siteName: 'Si-Si',
     locale: 'ru_RU',
     type: 'website',
+    images: [
+      {
+        url: '/og-cover.jpg',
+        width: 1200,
+        height: 630,
+        alt: 'Si-Si — флористика и оформление мероприятий в Москве',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Si-Si — Оформление мероприятий в Москве за 24 часа',
     description:
       'Флористический декор под ключ: входные группы, свадьбы, корпоративы. Москва и МО. Старт за 24 часа.',
+    images: ['/og-cover.jpg'],
   },
 }
 
@@ -103,10 +114,10 @@ const jsonLdLocalBusiness = {
   description:
     'Флористическое оформление мероприятий, входных групп, свадеб и корпоративов ' +
     'в Москве и Московской области. Под ключ за 24 часа.',
-  url: process.env.NEXT_PUBLIC_SITE_URL ?? 'https://si-si.ru',
+  url: siteUrl,
   telephone: '+74957921898',
   email: 'sisidekor860@mail.ru',
-  image: `${process.env.NEXT_PUBLIC_SITE_URL ?? 'https://si-si.ru'}/og-cover.jpg`,
+  image: `${siteUrl}/og-cover.jpg`,
   address: {
     '@type': 'PostalAddress',
     streetAddress: 'Каширское ш., д. 48, к. 2, помещение 2П',
@@ -223,10 +234,18 @@ export default function HomePage() {
           aria-labelledby="calculator-heading"
           className="relative scroll-mt-20 overflow-hidden bg-brand-onyx py-20 sm:py-24 lg:py-28"
         >
-          {/* Wine glow accent */}
+          {/* Celebration glows — wine + lavender + apricot pastel accents */}
           <div
             aria-hidden="true"
             className="pointer-events-none absolute left-[-10%] top-24 h-[26rem] w-[26rem] rounded-full bg-brand-wine/40 blur-3xl"
+          />
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute bottom-16 right-[-8%] h-[24rem] w-[24rem] rounded-full bg-brand-lilac/30 blur-3xl"
+          />
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute right-[22%] top-10 h-56 w-56 rounded-full bg-brand-peach/25 blur-3xl"
           />
 
           {/* Floating flowers and balloons */}
