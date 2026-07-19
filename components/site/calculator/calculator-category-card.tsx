@@ -78,7 +78,7 @@ function buildDefaultSelections(
   fields: CategoryField[],
 ): Record<string, string | boolean> {
   const defaults: Record<string, string | boolean> = {}
-  for (const field of fields) {
+  for (const field of config.fields) {
     if (field.defaultValue !== undefined) {
       defaults[field.id] =
         typeof field.defaultValue === 'boolean'
@@ -599,47 +599,41 @@ export function CalculatorCategoryCard({
       </div>
       )}
 
-      {/* Urgent notice */}
-      {isUrgent && !isCustomBouquet && (
-        <div className="mt-4 rounded-xl border border-brand-gold/30 bg-brand-gold/[0.07] px-4 py-3 text-xs leading-relaxed text-brand-gold-light">
+      {/* Urgency notice */}
+      {isUrgent && (
+        <div className="mt-5 rounded-xl border border-brand-gold/30 bg-brand-gold/[0.07] px-4 py-3 text-xs leading-relaxed text-brand-gold-light">
           {locale === 'en'
-            ? '⚡ Urgent order — we will confirm feasibility and exact timeline by phone.'
-            : '⚡ Срочный заказ — возможность и точные сроки подтвердим по телефону.'}
+            ? '⚡ Urgent orders are confirmed by phone — our manager will call you within 30 minutes after the request.'
+            : '⚡ Срочные заказы подтверждаются по телефону — менеджер свяжется с вами в течение 30 минут после заявки.'}
         </div>
       )}
 
-      {/* Live price preview + CTA */}
-      <div className="mt-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <p className="text-xs uppercase tracking-[0.18em] text-brand-stone">
-            {locale === 'en' ? 'Estimated' : 'Ориентировочно'}
-          </p>
-          <p className="mt-1 text-xl font-bold text-gold-gradient">
-            {isCustomBouquet
-              ? fmtAmount(Math.max(BOUQUET_MIN, Math.round(customAmount) || BOUQUET_MIN))
-              : previewPrice !== null
-                ? fmt(previewPrice)
-                : fmt(Math.round(config.pricing.basePrice * config.pricing.markupCoefficient))}
-          </p>
+      {/* Live price preview */}
+      {previewPrice !== null && (
+        <div className="mt-5 flex items-center justify-between rounded-xl border border-brand-midnight-border bg-brand-midnight-soft/60 px-4 py-3">
+          <span className="text-sm text-brand-stone">
+            {locale === 'en' ? 'Approximate total' : 'Ориентировочно'}
+          </span>
+          <span className="font-semibold text-brand-parchment">
+            {fmt(previewPrice)}
+          </span>
         </div>
-        <button
-          type="button"
-          onClick={isCustomBouquet ? handleBouquetCalculate : handleCalculate}
-          className="
-            btn-gold-sheen sheen-always
-            inline-flex min-h-11 items-center justify-center gap-2
-            rounded-btn px-6 py-3 text-sm font-semibold text-brand-ink
-            shadow-gold-glow transition-transform duration-base
-            hover:-translate-y-0.5
-            focus-visible:outline-none focus-visible:ring-2
-            focus-visible:ring-brand-gold
-          "
-        >
-          {alreadyInCart
-            ? locale === 'en' ? 'Update in estimate' : 'Обновить в смете'
-            : locale === 'en' ? 'Add to estimate' : 'Добавить в смету'}
-        </button>
-      </div>
+      )}
+
+      {/* Calculate CTA */}
+      <button
+        type="button"
+        onClick={isCustomBouquet ? handleBouquetCalculate : handleCalculate}
+        className="btn-gold-sheen sheen-always mt-6 inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-btn px-6 py-3 text-sm font-semibold text-brand-ink transition-transform duration-base hover:-translate-y-0.5"
+      >
+        {alreadyInCart
+          ? locale === 'en'
+            ? 'Recalculate'
+            : 'Пересчитать'
+          : locale === 'en'
+            ? 'Add to estimate'
+            : 'Добавить в смету'}
+      </button>
     </motion.div>
   )
 }
