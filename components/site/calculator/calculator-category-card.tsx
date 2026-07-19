@@ -78,7 +78,7 @@ function buildDefaultSelections(
   fields: CategoryField[],
 ): Record<string, string | boolean> {
   const defaults: Record<string, string | boolean> = {}
-  for (const field of config.fields) {
+  for (const field of fields) {
     if (field.defaultValue !== undefined) {
       defaults[field.id] =
         typeof field.defaultValue === 'boolean'
