@@ -318,7 +318,7 @@ export function CalculatorSummary({
           type="button"
           onClick={handleSubmit}
           className="
-            btn-gold-sheen animate-sheen
+            btn-gold-sheen sheen-always
             min-h-11 w-full rounded-btn px-5 py-3.5
             text-center text-sm font-semibold text-brand-ink
             shadow-gold-glow transition-transform duration-base
